@@ -75,7 +75,14 @@
           ', y: ' +
           circBMidPoint.y.toFixed(2) +
           ' }';
-        let outputStr3 = getRSR(startCar, endCar).toString();
+        let outputStr3 = JSON.stringify(
+          getRSR(startCar, endCar),
+          (key, value) => {
+            if (typeof value === 'number') return value.toFixed(2);
+            else return value;
+          },
+          '<br>'
+        );
 
         setOutput(outputStr1, outputStr2, outputStr3);
       }
