@@ -142,7 +142,16 @@ function getRSR(car1, car2, r) {
     //   'length arc 2: ',
     //   lengthArc2
     // );
-    return lengthArc1 + CD + lengthArc2;
+    return {
+        startCarToAAngle: startCarToAAngle,
+        endCarToBAngle: endCarToBAngle,
+        cOrDAngle: cOrDAngle,
+        innerAngleStartC: innerAngleStartC,
+        innerAngleDEnd: innerAngleDEnd,
+        lengthArc1: lengthArc1,
+        lengthArc2: lengthArc2
+    };
+    //return lengthArc1 + CD + lengthArc2;
     // // orthogonal slope to AB, along this is C and mirrorC/D and mirrorD
     // let invAB: number =
     //   -1 / ((circle2.y - circle1.y) ** 2 / (circle2.x - circle1.x) ** 2);
