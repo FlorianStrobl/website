@@ -89,11 +89,12 @@ function getRSR(car1, car2, r) {
     if (car1 === void 0) { car1 = startCar; }
     if (car2 === void 0) { car2 = goalCar; }
     if (r === void 0) { r = turningRadius; }
+    console.log(car1, car2);
     // TODO, fix division by 0 and negatives in the sqrts
     // #region get circles
     // the right cirlces of start car and end car
-    var A = getRightCircle(startCar);
-    var B = getRightCircle(goalCar);
+    var A = getRightCircle(car1);
+    var B = getRightCircle(car2);
     // #endregion
     // #region get linear distances
     // distance between point A and B (circle1 and circle2)
@@ -103,8 +104,8 @@ function getRSR(car1, car2, r) {
     // #region get simple (outer) angles
     // (1, 0)=0deg; (0, 1)=90deg; (-1, 0)=180deg; (0, -1)=270deg
     // the angle the car has to the circle if you trace around the circumference
-    var startCarToAAngle = correctRad(Math.atan2(startCar.pos.y - A.y, startCar.pos.x - A.x));
-    var endCarToBAngle = correctRad(Math.atan2(goalCar.pos.y - B.y, goalCar.pos.x - B.x));
+    var startCarToAAngle = correctRad(Math.atan2(car1.pos.y - A.y, car1.pos.x - A.x));
+    var endCarToBAngle = correctRad(Math.atan2(car2.pos.y - B.y, car2.pos.x - B.x));
     // the angle around the circle to C or D
     var cOrDAngle = correctRad(Math.atan2(B.y - A.y, B.x - A.x) + Math.PI / 2);
     // #endregion
@@ -149,7 +150,8 @@ function getRSR(car1, car2, r) {
         innerAngleStartC: innerAngleStartC,
         innerAngleDEnd: innerAngleDEnd,
         lengthArc1: lengthArc1,
-        lengthArc2: lengthArc2
+        lengthArc2: lengthArc2,
+        lengthTotalDistance: lengthArc1 + CD + lengthArc2
     };
     //return lengthArc1 + CD + lengthArc2;
     // // orthogonal slope to AB, along this is C and mirrorC/D and mirrorD

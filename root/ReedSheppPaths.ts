@@ -94,12 +94,14 @@ function getRSR(
    * then we get the absolute difference between these two values to get centralAngle
    */
 
+  console.log(car1, car2);
+
   // TODO, fix division by 0 and negatives in the sqrts
 
   // #region get circles
   // the right cirlces of start car and end car
-  let A: pos = getRightCircle(startCar);
-  let B: pos = getRightCircle(goalCar);
+  let A: pos = getRightCircle(car1);
+  let B: pos = getRightCircle(car2);
   // #endregion
 
   // #region get linear distances
@@ -112,10 +114,10 @@ function getRSR(
   // (1, 0)=0deg; (0, 1)=90deg; (-1, 0)=180deg; (0, -1)=270deg
   // the angle the car has to the circle if you trace around the circumference
   const startCarToAAngle: rad = correctRad(
-    Math.atan2(startCar.pos.y - A.y, startCar.pos.x - A.x)
+    Math.atan2(car1.pos.y - A.y, car1.pos.x - A.x)
   );
   const endCarToBAngle: rad = correctRad(
-    Math.atan2(goalCar.pos.y - B.y, goalCar.pos.x - B.x)
+    Math.atan2(car2.pos.y - B.y, car2.pos.x - B.x)
   );
   // the angle around the circle to C or D
   const cOrDAngle: rad = correctRad(
@@ -166,7 +168,8 @@ function getRSR(
     innerAngleStartC: innerAngleStartC,
     innerAngleDEnd: innerAngleDEnd,
     lengthArc1: lengthArc1,
-    lengthArc2: lengthArc2
+    lengthArc2: lengthArc2,
+    lengthTotalDistance: lengthArc1 + CD + lengthArc2
   } as unknown as number;
   //return lengthArc1 + CD + lengthArc2;
 
