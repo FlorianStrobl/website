@@ -20,15 +20,18 @@
     <button id="runButton" onclick="run()">Calculate</button>
 
     <p>Values:</p>
-    <p id="output"></p>
+    <p id="output0"></p>
+    <p id="output1"></p>
     <p id="output2"></p>
+    <p id="output3"></p>
+    <p id="output4"></p>
 
     <script type="text/javascript" src="ReedSheppPaths.js"></script>
 
     <script>
-      function setOutput(...str) {
-        document.getElementById('output').innerHTML = str[0];
-        document.getElementById('output2').innerHTML = str[1];
+      function setOutput(...strs) {
+        for (let i = 0; i < strs.length; ++i)
+          document.getElementById('output' + i).innerHTML = str[i];
       }
 
       function run() {
@@ -69,8 +72,6 @@
           '}\n';
 
         setOutput([outputStr1, outputStr2]);
-
-        console.log(startValues, endValues);
       }
     </script>
   </body>
