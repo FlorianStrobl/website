@@ -122,7 +122,7 @@
 
       const setPixel = (x, y, color) => {
         ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
-        ctx.fillRect(x, y, 1, 1);
+        ctx.fillRect(x, 100 - y, 1, 1);
       };
 
       const drawCircle = (x, y, r, color) => {
