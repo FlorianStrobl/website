@@ -5,7 +5,7 @@
 
     <form>
       <label for="startPos"
-        >Car start position (x, y, heading in deg 0-360): </label
+        >Car start position (x, y, heading in deg 0 to 360):</label
       ><br />
       <input
         type="text"
@@ -13,23 +13,37 @@
         name="startPos"
         value="(0, 0, 0)"
       /><br />
+      <br />
       <label for="endPos">Car goal position (x, y, heading): </label><br />
       <input type="text" id="endPos" name="endPos" value="(1, 0, 0)" />
-      <p>(turning radius = 1)</p>
+      <p>(turning radius = 10)</p>
     </form>
 
-    <button id="runButton" onclick="run()">Calculate</button>
+    <button id="runButton" onclick="(() => {run(); draw();})()">
+      Calculate
+    </button>
 
-    <p>Values:</p>
     <p id="output0"></p>
     <p id="output1"></p>
     <p id="output2"></p>
     <p id="output3"></p>
     <p id="output4"></p>
 
+    <canvas
+      id="canvas"
+      width="100"
+      height="100"
+      style="border: 1px solid #000000"
+    ></canvas>
+
     <script type="text/javascript" src="ReedSheppPaths.js"></script>
 
     <script>
+      var startCar;
+      var endCar;
+      var _A;
+      var _B;
+
       function setOutput(...strs) {
         for (let i = 0; i < strs.length; ++i)
           document.getElementById('output' + i.toString()).innerHTML = strs[i];
@@ -60,8 +74,14 @@
           heading: endValues[2]
         };
 
+        startCar = _startCar;
+        endCar = _endCar;
+
         const circAMidPoint = getRightCircle(_startCar);
         const circBMidPoint = getRightCircle(_endCar);
+
+        _A = circAMidPoint;
+        _B = circBMidPoint;
 
         let outputStr1 =
           'Right circle from start car middle point: { x: ' +
@@ -92,6 +112,39 @@
           outputStr2,
           'Angles in deg, lengths in units: ' + outputStr3
         );
+      }
+    </script>
+
+    <script>
+      //const pxls = new Array(height).fill(new Array(width).fill(0));
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const setPixel = (x, y, color) => {
+        ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
+        ctx.fillRect(x, y, 1, 1);
+      };
+
+      const drawCircle = (x, y, r, color) => {
+        ctx.beginPath();
+        ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`; // TODO
+        ctx.arc(x, y, turningRadius, 0, Math.PI * 2);
+        ctx.stroke();
+      };
+
+      function draw() {
+        clearScreen();
+        setPixel(startCar.pos.x, startCar.pos.y, [0, 0, 255]); // start car
+        setPixel(endCar.pos.x, endCar.pos.y, [0, 255, 0]); // end car
+        setPixel(_A.x, _A.y, [255, 0, 255]); // A
+        setPixel(_B.x, _B.y, [255, 255, 0]); // B
+        drawCircle(_A.x, _A.y, turningRadius, [255, 0, 0]); // A circle
+        drawCircle(_B.x, _B.y, turningRadius, [255, 0, 0]); // B circle
+      }
+
+      function clearScreen() {
+        for (let y = 0; y < 100; ++y)
+          for (let x = 0; x < 100; ++x) setPixel(x, y, [255, 255, 255]);
       }
     </script>
   </body>

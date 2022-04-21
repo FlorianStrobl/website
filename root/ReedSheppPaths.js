@@ -15,7 +15,7 @@ var printf = function () {
 // #endregion
 // #region car data
 // the turning radius r for the given car
-var turningRadius = 1; // some arbitrary number for now
+var turningRadius = 10; // some arbitrary number for now
 // if start car = (0, 0, 0) and end car = (x, 0, PI)
 // then the RSR path has the length = turningRadius * PI + (|A-B|)
 // start values of the car
@@ -89,7 +89,6 @@ function getRSR(car1, car2, r) {
     if (car1 === void 0) { car1 = startCar; }
     if (car2 === void 0) { car2 = goalCar; }
     if (r === void 0) { r = turningRadius; }
-    console.log(car1, car2);
     // TODO, fix division by 0 and negatives in the sqrts
     // #region get circles
     // the right cirlces of start car and end car

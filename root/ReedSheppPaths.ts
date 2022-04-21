@@ -17,7 +17,7 @@ type car = { pos: pos; heading: rad }; // a cars values
 
 // #region car data
 // the turning radius r for the given car
-const turningRadius: number = 1; // some arbitrary number for now
+const turningRadius: number = 10; // some arbitrary number for now
 
 // if start car = (0, 0, 0) and end car = (x, 0, PI)
 // then the RSR path has the length = turningRadius * PI + (|A-B|)
@@ -93,8 +93,6 @@ function getRSR(
    * we do the same thing for C/D to A/B
    * then we get the absolute difference between these two values to get centralAngle
    */
-
-  console.log(car1, car2);
 
   // TODO, fix division by 0 and negatives in the sqrts
 
