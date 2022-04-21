@@ -21,15 +21,18 @@
 
     <p>Values:</p>
     <p id="output"></p>
+    <p id="output2"></p>
 
     <script type="text/javascript" src="ReedSheppPaths.js"></script>
 
     <script>
-      function setOutput(str) {
-        document.getElementById('output').innerHTML = str;
+      function setOutput(...str) {
+        document.getElementById('output').innerHTML = str[0];
+        document.getElementById('output2').innerHTML = str[1];
       }
 
       function run() {
+        // values
         const startValues = document
           .getElementById('startPos')
           .value.slice(1, -1)
@@ -43,28 +46,29 @@
         startValues[2] = degToRad(startValues[2]);
         endValues[2] = degToRad(endValues[2]);
 
-        let outputStr = 'Right circle from start car middle point: { x: ';
-        let circleAMiddlePoint = getRightCircle({
+        const circleAMiddlePoint = getRightCircle({
           pos: { x: startValues[0], y: startValues[1] },
           heading: startValues[2]
         });
-        let circleBMiddlePoint = getRightCircle({
+        const circleBMiddlePoint = getRightCircle({
           pos: { x: endValues[0], y: endValues[1] },
           heading: endValues[2]
         });
-        outputStr +=
+
+        let outputStr1 =
+          'Right circle from start car middle point: { x: ' +
           circleAMiddlePoint.x.toFixed(2) +
           ', y: ' +
           circleAMiddlePoint.y.toFixed(2) +
           '}\n';
-        outputStr +=
+        let outputStr2 =
           'Right circle from end car middle point:' +
           circleBMiddlePoint.x.toFixed(2) +
           ', y: ' +
           circleBMiddlePoint.y.toFixed(2) +
           '}\n';
 
-        setOutput(outputStr);
+        setOutput([outputStr1, outputStr2]);
 
         console.log(startValues, endValues);
       }
