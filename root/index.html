@@ -78,7 +78,9 @@
         let outputStr3 = JSON.stringify(
           getRSR(startCar, endCar),
           (key, value) => {
-            if (typeof value === 'number') return value.toFixed(2);
+            if (typeof value === 'number' && !key.startsWith('length'))
+              return radToDeg(value).toFixed(2);
+            else if (typeof value === 'number') return value.toFixed(2);
             else return value;
           },
           '<br>'
