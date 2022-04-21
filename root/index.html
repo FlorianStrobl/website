@@ -31,7 +31,7 @@
     <script>
       function setOutput(...strs) {
         for (let i = 0; i < strs.length; ++i)
-          document.getElementById('output' + i).innerHTML = str[i];
+          document.getElementById('output' + i.toString()).innerHTML = strs[i];
       }
 
       function run() {
