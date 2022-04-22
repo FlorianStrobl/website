@@ -111,13 +111,13 @@ function getRSR(car1, car2, r) {
     // #region get inner angles
     var innerAngleStartC = 0;
     if (startCarToAAngle > cOrDAngle)
-        innerAngleStartC = Math.PI * 2 - (startCarToAAngle - cOrDAngle);
+        innerAngleStartC = Math.PI * 2 + (cOrDAngle - startCarToAAngle);
     else
         innerAngleStartC = cOrDAngle - startCarToAAngle;
     // same for the other side
     var innerAngleDEnd = endCarToBAngle - cOrDAngle;
     if (endCarToBAngle > cOrDAngle)
-        innerAngleDEnd = Math.PI * 2 - (endCarToBAngle - cOrDAngle);
+        innerAngleDEnd = Math.PI * 2 + (cOrDAngle - endCarToBAngle);
     else
         innerAngleDEnd = cOrDAngle - endCarToBAngle;
     // #endregion

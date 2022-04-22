@@ -126,12 +126,12 @@ function getRSR(
   // #region get inner angles
   let innerAngleStartC: rad = 0;
   if (startCarToAAngle > cOrDAngle)
-    innerAngleStartC = Math.PI * 2 - (startCarToAAngle - cOrDAngle);
+    innerAngleStartC = Math.PI * 2 + (cOrDAngle - startCarToAAngle);
   else innerAngleStartC = cOrDAngle - startCarToAAngle;
   // same for the other side
   let innerAngleDEnd: rad = endCarToBAngle - cOrDAngle;
   if (endCarToBAngle > cOrDAngle)
-    innerAngleDEnd = Math.PI * 2 - (endCarToBAngle - cOrDAngle);
+    innerAngleDEnd = Math.PI * 2 + (cOrDAngle - endCarToBAngle);
   else innerAngleDEnd = cOrDAngle - endCarToBAngle;
   // #endregion
 
