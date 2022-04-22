@@ -57,6 +57,7 @@
       var _B;
       var _r;
       var _cOrDAngle;
+      var _cOrDAngle2;
 
       function setOutput(...strs) {
         for (let i = 0; i < strs.length; ++i)
@@ -116,6 +117,7 @@
 
         const vals = getRSR(_startCar, _endCar, turningRadius);
         _cOrDAngle = vals.cOrDAngle;
+        _cOrDAngle2 = vals.cOrDAngle2;
 
         const outputStr3 = JSON.stringify(
           vals,
@@ -177,18 +179,40 @@
           y: _B.y + Math.sin(_cOrDAngle) * _r
         };
 
+        const C2 = {
+          x: _A.x + Math.cos(_cOrDAngle2) * _r,
+          y: _A.y + Math.sin(_cOrDAngle2) * _r
+        };
+
+        const D2 = {
+          x: _B.x + Math.cos(_cOrDAngle2) * _r,
+          y: _B.y + Math.sin(_cOrDAngle2) * _r
+        };
+
         setPixel(Math.floor(C.x), Math.floor(C.y), [0, 255, 255]); // C
 
         setPixel(Math.floor(D.x), Math.floor(D.y), [255, 255, 0]); // D
 
+        setPixel(Math.floor(C2.x), Math.floor(C2.y), [0, 255, 255]); // C2
+
+        setPixel(Math.floor(D2.x), Math.floor(D2.y), [255, 255, 0]); // D2
+
+        // A TO B
         ctx.beginPath();
         ctx.moveTo(size / 2 + _A.x, size / 2 - _A.y);
         ctx.lineTo(size / 2 + _B.x, size / 2 - _B.y);
         ctx.stroke();
 
+        // C TO D
         ctx.beginPath();
         ctx.moveTo(size / 2 + Math.floor(C.x), size / 2 - Math.floor(C.y));
         ctx.lineTo(size / 2 + Math.floor(D.x), size / 2 - Math.floor(D.y));
+        ctx.stroke();
+
+        // C2 TO D2
+        ctx.beginPath();
+        ctx.moveTo(size / 2 + Math.floor(C2.x), size / 2 - Math.floor(C2.y));
+        ctx.lineTo(size / 2 + Math.floor(D2.x), size / 2 - Math.floor(D2.y));
         ctx.stroke();
 
         //const tmp = (_A.x - _B.x) * (_A.x - C.x) + (_A.y - _B.y) * (_A.y - C.y);
