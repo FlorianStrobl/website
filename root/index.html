@@ -56,6 +56,7 @@
       var _A;
       var _B;
       var _r;
+      var _cOrDAngle;
 
       function setOutput(...strs) {
         for (let i = 0; i < strs.length; ++i)
@@ -100,20 +101,23 @@
         _A = circAMidPoint;
         _B = circBMidPoint;
 
-        let outputStr1 =
+        const outputStr1 =
           'Right circle from start car middle point: { x: ' +
           circAMidPoint.x.toFixed(2) +
           ', y: ' +
           circAMidPoint.y.toFixed(2) +
           ' }';
-        let outputStr2 =
+        const outputStr2 =
           'Right circle from end car middle point: { x: ' +
           circBMidPoint.x.toFixed(2) +
           ', y: ' +
           circBMidPoint.y.toFixed(2) +
           ' }';
+
         const vals = getRSR(_startCar, _endCar);
-        let outputStr3 = JSON.stringify(
+        _cOrDAngle = vals.cOrDAngle;
+
+        const outputStr3 = JSON.stringify(
           vals,
           (key, value) => {
             if (typeof value === 'number' && !key.startsWith('length'))
@@ -162,6 +166,30 @@
 
         drawCircle(_A.x, _A.y, _r, [255, 0, 0]); // A circle
         drawCircle(_B.x, _B.y, _r, [255, 0, 0]); // B circle
+
+        const C = {
+          x: Math.floor(_A.x + Math.cos(_cOrDAngle) * _r),
+          y: Math.floor(_A.y + Math.sin(_cOrDAngle) * _r)
+        };
+
+        const D = {
+          x: Math.floor(_B.x + Math.cos(_cOrDAngle) * _r),
+          y: Math.floor(_B.y + Math.sin(_cOrDAngle) * _r)
+        };
+
+        setPixel(C.x, C.y, [0, 255, 255]); // C
+
+        setPixel(D.x, D.y, [255, 255, 0]); // D
+
+        ctx.beginPath();
+        ctx.moveTo(size / 2 + _A.x, size / 2 - _A.y);
+        ctx.lineTo(size / 2 + _B.x, size / 2 - _B.y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(size / 2 + C.x, size / 2 - C.y);
+        ctx.lineTo(size / 2 + D.x, size / 2 - D.y);
+        ctx.stroke();
       }
 
       function clearScreen() {
