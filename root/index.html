@@ -168,18 +168,18 @@
         drawCircle(_B.x, _B.y, _r, [255, 0, 0]); // B circle
 
         const C = {
-          x: Math.floor(_A.x + Math.cos(_cOrDAngle) * _r),
-          y: Math.floor(_A.y + Math.sin(_cOrDAngle) * _r)
+          x: _A.x + Math.cos(_cOrDAngle) * _r,
+          y: _A.y + Math.sin(_cOrDAngle) * _r
         };
 
         const D = {
-          x: Math.floor(_B.x + Math.cos(_cOrDAngle) * _r),
-          y: Math.floor(_B.y + Math.sin(_cOrDAngle) * _r)
+          x: _B.x + Math.cos(_cOrDAngle) * _r,
+          y: _B.y + Math.sin(_cOrDAngle) * _r
         };
 
-        setPixel(C.x, C.y, [0, 255, 255]); // C
+        setPixel(Math.floor(C.x), Math.floor(C.y), [0, 255, 255]); // C
 
-        setPixel(D.x, D.y, [255, 255, 0]); // D
+        setPixel(Math.floor(D.x), Math.floor(D.y), [255, 255, 0]); // D
 
         ctx.beginPath();
         ctx.moveTo(size / 2 + _A.x, size / 2 - _A.y);
@@ -187,8 +187,8 @@
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(size / 2 + C.x, size / 2 - C.y);
-        ctx.lineTo(size / 2 + D.x, size / 2 - D.y);
+        ctx.moveTo(size / 2 + Math.floor(C.x), size / 2 - Math.floor(C.y));
+        ctx.lineTo(size / 2 + Math.floor(D.x), size / 2 - Math.floor(D.y));
         ctx.stroke();
       }
 
