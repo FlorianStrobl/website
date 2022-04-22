@@ -7,8 +7,6 @@
 // 0 radiants/0 degree means in generell east/right, no negative values
 // position (0, 0) is the middle of the field
 
-const printf = (...x: any) => console.log(...x);
-
 // #region types
 type rad = number; // radiants
 type pos = { x: number; y: number }; // a position
@@ -98,14 +96,15 @@ function getRSR(
 
   // #region get circles
   // the right cirlces of start car and end car
-  let A: pos = getRightCircle(car1);
-  let B: pos = getRightCircle(car2);
+  let A: pos = getRightCircle(car1, r);
+  let B: pos = getRightCircle(car2, r);
   // #endregion
 
   // #region get linear distances
   // distance between point A and B (circle1 and circle2)
   const AB: number = Math.sqrt((A.y - B.y) ** 2 + (A.x - B.x) ** 2);
   const CD: number = AB; // distance CD is the same as the one from AB
+  //const slopeAB: number = (A.y - B.y) / (A.x - B.x);
   // #endregion
 
   // #region get simple (outer) angles
@@ -121,6 +120,33 @@ function getRSR(
   const cOrDAngle: rad = correctRad(
     Math.atan2(B.y - A.y, B.x - A.x) + Math.PI / 2
   );
+
+  // #region new TODO
+  // f(x) = invSlope * x + n, where we get n from the Point A
+  // const invSlope: number = -1 / slopeAB;
+  // console.log('inv slope', invSlope, slopeAB, A, B, r);
+  // // f(A.x) = A.y = invSlope * A.x + n => n = A.y - invSlope * A.x
+  // const n: number = A.y - invSlope * A.x;
+  // let _x1: number =
+  //   (invSlope * n + Math.sqrt(r * r * (invSlope ** 2 + 1) - n * n)) /
+  //   (invSlope ** 2 + 1);
+  // let _x2: number =
+  //   (invSlope * n - Math.sqrt(r * r * (invSlope ** 2 + 1) - n * n)) /
+  //   (invSlope ** 2 + 1);
+  // const C: pos = {
+  //   x: _x1,
+  //   y: invSlope * _x1 + n
+  // };
+  // const mirrorC: pos = {
+  //   x: _x2,
+  //   y: invSlope * _x2 + n
+  // };
+  // const cAngle: number = correctRad(Math.atan2(C.y - A.y, C.x - A.x));
+  // const mirrorCAngle: number = correctRad(
+  //   Math.atan2(mirrorC.y - A.y, mirrorC.x - A.x)
+  // );
+  // console.log(cAngle);
+  // #endregion
   // #endregion
 
   // #region get inner angles
@@ -232,5 +258,3 @@ function getLSL(circle1: pos, circle2: pos) {}
 // LSR, RSL, lsr, rsl
 function getLSRorRLS(circle1: pos, circle2: pos) {}
 // #endregion
-
-//printf(getRSR(getLeftCircle(startCar), getLeftCircle(goalCar)));

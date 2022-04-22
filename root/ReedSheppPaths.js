@@ -1,17 +1,5 @@
 // Florian Strobl and Vladimir, April 2022
 // Implementation of Reed and Shepps Curves/Paths
-// conventions
-// L: left forward, R: right forward, S: straight forward,
-// l: left backwards, r: right backwards, s: straight backwards
-// 0 radiants/0 degree means in generell east/right, no negative values
-// position (0, 0) is the middle of the field
-var printf = function () {
-    var x = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        x[_i] = arguments[_i];
-    }
-    return console.log.apply(console, x);
-};
 // #endregion
 // #region car data
 // the turning radius r for the given car
@@ -92,13 +80,14 @@ function getRSR(car1, car2, r) {
     // TODO, fix division by 0 and negatives in the sqrts
     // #region get circles
     // the right cirlces of start car and end car
-    var A = getRightCircle(car1);
-    var B = getRightCircle(car2);
+    var A = getRightCircle(car1, r);
+    var B = getRightCircle(car2, r);
     // #endregion
     // #region get linear distances
     // distance between point A and B (circle1 and circle2)
     var AB = Math.sqrt(Math.pow((A.y - B.y), 2) + Math.pow((A.x - B.x), 2));
     var CD = AB; // distance CD is the same as the one from AB
+    //const slopeAB: number = (A.y - B.y) / (A.x - B.x);
     // #endregion
     // #region get simple (outer) angles
     // (1, 0)=0deg; (0, 1)=90deg; (-1, 0)=180deg; (0, -1)=270deg
@@ -107,6 +96,32 @@ function getRSR(car1, car2, r) {
     var endCarToBAngle = correctRad(Math.atan2(car2.pos.y - B.y, car2.pos.x - B.x));
     // the angle around the circle to C or D
     var cOrDAngle = correctRad(Math.atan2(B.y - A.y, B.x - A.x) + Math.PI / 2);
+    // #region new TODO
+    // f(x) = invSlope * x + n, where we get n from the Point A
+    // const invSlope: number = -1 / slopeAB;
+    // console.log('inv slope', invSlope, slopeAB, A, B, r);
+    // // f(A.x) = A.y = invSlope * A.x + n => n = A.y - invSlope * A.x
+    // const n: number = A.y - invSlope * A.x;
+    // let _x1: number =
+    //   (invSlope * n + Math.sqrt(r * r * (invSlope ** 2 + 1) - n * n)) /
+    //   (invSlope ** 2 + 1);
+    // let _x2: number =
+    //   (invSlope * n - Math.sqrt(r * r * (invSlope ** 2 + 1) - n * n)) /
+    //   (invSlope ** 2 + 1);
+    // const C: pos = {
+    //   x: _x1,
+    //   y: invSlope * _x1 + n
+    // };
+    // const mirrorC: pos = {
+    //   x: _x2,
+    //   y: invSlope * _x2 + n
+    // };
+    // const cAngle: number = correctRad(Math.atan2(C.y - A.y, C.x - A.x));
+    // const mirrorCAngle: number = correctRad(
+    //   Math.atan2(mirrorC.y - A.y, mirrorC.x - A.x)
+    // );
+    // console.log(cAngle);
+    // #endregion
     // #endregion
     // #region get inner angles
     var innerAngleStartC = 0;
@@ -207,4 +222,3 @@ function getLSL(circle1, circle2) { }
 // LSR, RSL, lsr, rsl
 function getLSRorRLS(circle1, circle2) { }
 // #endregion
-//printf(getRSR(getLeftCircle(startCar), getLeftCircle(goalCar)));
