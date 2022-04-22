@@ -5,7 +5,7 @@
 
     <form>
       <label for="startPos"
-        >Car start position (x, y, heading in deg 0 to 360):</label
+        >Car start (red) position (x, y, heading in deg 0 to 360):</label
       ><br />
       <input
         type="text"
@@ -14,7 +14,8 @@
         value="(100, 100, 0)"
       /><br />
       <br />
-      <label for="endPos">Car goal position (x, y, heading): </label><br />
+      <label for="endPos">Car goal (green) position (x, y, heading): </label
+      ><br />
       <input
         type="text"
         id="endPos"
@@ -140,14 +141,14 @@
 
       const setPixel = (x, y, color) => {
         ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
-        ctx.fillRect(size / 2 - x - 2, size / 2 - y - 2, 4, 4);
-        //console.log(x, y, color);
+        ctx.fillRect(size / 2 + x - 2, size / 2 - y - 2, 4, 4);
+        //console.log(size / 2 + x, size / 2 - y);
       };
 
       const drawCircle = (x, y, r, color) => {
         ctx.beginPath();
         ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`; // TODO
-        ctx.arc(size / 2 - x, size / 2 - y, r, 0, Math.PI * 2);
+        ctx.arc(size / 2 + x, size / 2 - y, r, 0, Math.PI * 2);
         ctx.stroke();
       };
 
