@@ -191,11 +191,8 @@
         ctx.lineTo(size / 2 + Math.floor(D.x), size / 2 - Math.floor(D.y));
         ctx.stroke();
 
-        console.log(
-          //{ x: _A.x - C.x, y: _A.y - C.y },
-          //{ x: _B.x - D.x, y: _B.y - D.y },
-          (_A.x - _B.x) * (_A.x - C.x) + (_A.y - _B.y) * (_A.y - C.y)
-        );
+        //const tmp = (_A.x - _B.x) * (_A.x - C.x) + (_A.y - _B.y) * (_A.y - C.y);
+        //console.log(tmp.toString(9));
       }
 
       function clearScreen() {
