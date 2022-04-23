@@ -143,9 +143,24 @@ function getRSR(
 
   // newX = oldX + v * cos(theta)
 
+  const C = {
+    x: A.x + Math.cos(cOrDAngle) * r,
+    y: A.y + Math.sin(cOrDAngle) * r
+  };
+
   // TODO check if it is forwards or backwards
   console.log(
     'path lengths: ',
+    C,
+    lengthArc1,
+    {
+      x: car1.pos.x + lengthArc1 * Math.cos(car1.heading),
+      y: car1.pos.y + lengthArc1 * Math.sin(car1.heading)
+    },
+    {
+      x: car1.pos.x - lengthArc1 * Math.cos(car1.heading),
+      y: car1.pos.y - lengthArc1 * Math.sin(car1.heading)
+    },
     Math.round(lengthArc1 + lengthArc2 + CD),
     Math.round(lengthArcPrime1 + lengthArc2 + CD),
     Math.round(lengthArcPrime2 + lengthArc1 + CD),

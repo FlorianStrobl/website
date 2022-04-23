@@ -112,8 +112,18 @@ function getRSR(car1, car2, r) {
     var lengthArcPrime1 = r * correctRad(innerAngleStartCPrime); // some code
     var lengthArcPrime2 = r * correctRad(innerAngleDPrimeEnd);
     // newX = oldX + v * cos(theta)
+    var C = {
+        x: A.x + Math.cos(cOrDAngle) * r,
+        y: A.y + Math.sin(cOrDAngle) * r
+    };
     // TODO check if it is forwards or backwards
-    console.log('path lengths: ', Math.round(lengthArc1 + lengthArc2 + CD), Math.round(lengthArcPrime1 + lengthArc2 + CD), Math.round(lengthArcPrime2 + lengthArc1 + CD), Math.round(lengthArcPrime1 + lengthArcPrime2 + CD));
+    console.log('path lengths: ', C, lengthArc1, {
+        x: car1.pos.x + lengthArc1 * Math.cos(car1.heading),
+        y: car1.pos.y + lengthArc1 * Math.sin(car1.heading)
+    }, {
+        x: car1.pos.x - lengthArc1 * Math.cos(car1.heading),
+        y: car1.pos.y - lengthArc1 * Math.sin(car1.heading)
+    }, Math.round(lengthArc1 + lengthArc2 + CD), Math.round(lengthArcPrime1 + lengthArc2 + CD), Math.round(lengthArcPrime2 + lengthArc1 + CD), Math.round(lengthArcPrime1 + lengthArcPrime2 + CD));
     return {
         startCarToAAngle: startCarToAAngle,
         endCarToBAngle: endCarToBAngle,
