@@ -2,15 +2,12 @@
 // Implementation of Reed and Shepps Curves/Paths
 var ReedSheepPaths;
 (function (ReedSheepPaths) {
-    // conventions
-    // L: left forward, R: right forward, S: straight forward,
-    // l: left backwards, r: right backwards, s: straight backwards
-    // 0 radiants/0 degree means in generell east/right, no negative values
-    // position (0, 0) is the middle of the field
+    // conventions:
     // #endregion
     // #region car data
     // the turning radius r for the given car
     var turningRadius = 10; // some arbitrary number for now
+    // TODO, not sure about that haha
     // if start car = (0, 0, 0) and end car = (x, 0, PI)
     // then the RSR path has the length = turningRadius * PI + (|A-B|)
     // start values of the car
@@ -41,7 +38,8 @@ var ReedSheepPaths;
     }
     // #endregion
     // #region get turning circles middle points from car values
-    // get the left/right middle point of the current car (if the car steers to the left, it turns around this point with the distance r)
+    // get the left/right middle point of the current car
+    // (if the car steers to the left, it turns around this point with the distance r)
     function getLeftCircle(car, r) {
         if (r === void 0) { r = turningRadius; }
         return {
@@ -89,13 +87,13 @@ var ReedSheepPaths;
         if (car1 === void 0) { car1 = startCar; }
         if (car2 === void 0) { car2 = goalCar; }
         if (r === void 0) { r = turningRadius; }
-        // #region get circles
+        // #region circles
         // the right cirlces of start car and end car
         var A = getRightCircle(car1, r);
         var B = getRightCircle(car2, r);
         // #endregion
         // #region get linear distances
-        // distance between point A and B (circle1 and circle2)
+        // distance between point A and B
         var AB = Math.sqrt(Math.pow((A.y - B.y), 2) + Math.pow((A.x - B.x), 2));
         var CD = AB; // distance CD is the same as the one from AB
         // #endregion
@@ -105,27 +103,38 @@ var ReedSheepPaths;
         var endCarToBAngle = correctRad(Math.atan2(car2.pos.y - B.y, car2.pos.x - B.x));
         // the angle around the circle to C or D
         var cOrDAngle = correctRad(Math.atan2(B.y - A.y, B.x - A.x) + Math.PI / 2);
-        // its mirror NOT C/D Prime'
+        // its mirror (NOT C/D Prime' for RSL)
         var cOrDAngle2 = correctRad(Math.atan2(B.y - A.y, B.x - A.x) - Math.PI / 2);
+        // #endregion
         // #region get inner angles
+        // difference of the two angles, or 360deg - itself
         var innerAngleStartC = Math.abs(cOrDAngle - startCarToAAngle);
         var innerAngleStartCPrime = Math.PI * 2 - innerAngleStartC;
-        //if (startCarToAAngle > cOrDAngle) innerAngleStartC = Math.PI*2 - ...
-        //else innerAngleStartC = ...
         // same for the other side
         var innerAngleDEnd = Math.abs(cOrDAngle - endCarToBAngle);
         var innerAngleDPrimeEnd = Math.PI * 2 - innerAngleDEnd;
         // #endregion
-        // Length=radius*innerAngle
-        var lengthArc1 = r * correctRad(innerAngleStartC); // some code
+        // #region arc lengths
+        // arcLength = turningRadius * innerAngle
+        // startCar to C
+        var lengthArc1 = r * correctRad(innerAngleStartC);
+        // D to endCar
         var lengthArc2 = r * correctRad(innerAngleDEnd);
-        var lengthArcPrime1 = r * correctRad(innerAngleStartCPrime); // some code
+        // same but the other way around (forward gets to backwards and vice versa)
+        var lengthArcPrime1 = r * correctRad(innerAngleStartCPrime);
         var lengthArcPrime2 = r * correctRad(innerAngleDPrimeEnd);
-        // newX = oldX + v * cos(theta)
+        // #endregion
+        // #region C and D
+        // get the position of C
         var C = {
             x: A.x + Math.cos(cOrDAngle) * r,
             y: A.y + Math.sin(cOrDAngle) * r
         };
+        var D = {
+            x: B.x + Math.cos(cOrDAngle) * r,
+            y: B.y + Math.sin(cOrDAngle) * r
+        };
+        // #endregion
         // TODO check if it is forwards or backwards
         console.log('path lengths: ', C, lengthArc1, {
             x: car1.pos.x + lengthArc1 * Math.cos(car1.heading),
@@ -147,15 +156,14 @@ var ReedSheepPaths;
             lengthArcPrime1: lengthArcPrime1,
             lengthArcPrime2: lengthArcPrime2,
             cOrDAngle2: cOrDAngle2,
-            lengthTotalDistance: lengthArc1 + CD + lengthArc2
+            lengthTotalDistance: lengthArc1 + CD + lengthArc2,
+            A: A,
+            B: B,
+            C: C,
+            D: D
         };
         //return lengthArc1 + CD + lengthArc2;
     }
     ReedSheepPaths.getRSR = getRSR;
-    //console.log('total length: ', getRSR(startCar, goalCar));
-    // LSL, lsl paths
-    function getLSL(circle1, circle2) { }
-    // LSR, RSL, lsr, rsl
-    function getLSRorRLS(circle1, circle2) { }
     // #endregion
 })(ReedSheepPaths || (ReedSheepPaths = {}));

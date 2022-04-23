@@ -55,6 +55,8 @@
       var endCar;
       var _A;
       var _B;
+      var _C;
+      var _D;
       var _r;
       var _cOrDAngle;
       var _cOrDAngle2;
@@ -65,7 +67,7 @@
       }
 
       function run() {
-        // values
+        // #region html input values
         const startValues = document
           .getElementById('startPos')
           .value.slice(1, -1)
@@ -76,48 +78,48 @@
           .value.slice(1, -1)
           .split(',')
           .map((e) => Number(e));
+
         startValues[2] = ReedSheepPaths.degToRad(startValues[2]);
         endValues[2] = ReedSheepPaths.degToRad(endValues[2]);
+
+        // get the values from the document
         const turningRadius = Number(
           document.getElementById('turningRadius').value
         );
-        _r = turningRadius;
-
         const _startCar = {
           pos: { x: startValues[0], y: startValues[1] },
           heading: startValues[2]
         };
-
         const _endCar = {
           pos: { x: endValues[0], y: endValues[1] },
           heading: endValues[2]
         };
 
+        _r = turningRadius;
         startCar = _startCar;
         endCar = _endCar;
-
-        const circAMidPoint = ReedSheepPaths.getRightCircle(_startCar, turningRadius);
-        const circBMidPoint = ReedSheepPaths.getRightCircle(_endCar, turningRadius);
-
-        _A = circAMidPoint;
-        _B = circBMidPoint;
-
-        const outputStr1 =
-          'Right circle from start car middle point: { x: ' +
-          circAMidPoint.x.toFixed(2) +
-          ', y: ' +
-          circAMidPoint.y.toFixed(2) +
-          ' }';
-        const outputStr2 =
-          'Right circle from end car middle point: { x: ' +
-          circBMidPoint.x.toFixed(2) +
-          ', y: ' +
-          circBMidPoint.y.toFixed(2) +
-          ' }';
+        // #endregion
 
         const vals = ReedSheepPaths.getRSR(_startCar, _endCar, turningRadius);
         _cOrDAngle = vals.cOrDAngle;
         _cOrDAngle2 = vals.cOrDAngle2;
+        _A = vals.A;
+        _B = vals.B;
+        _C = vals.C;
+        _D = vals.D;
+
+        const outputStr1 =
+          'Right circle from start car middle point: { x: ' +
+          _A.x.toFixed(2) +
+          ', y: ' +
+          _A.y.toFixed(2) +
+          ' }';
+        const outputStr2 =
+          'Right circle from end car middle point: { x: ' +
+          _B.x.toFixed(2) +
+          ', y: ' +
+          _B.y.toFixed(2) +
+          ' }';
 
         const outputStr3 = JSON.stringify(
           vals,
@@ -169,15 +171,9 @@
         drawCircle(_A.x, _A.y, _r, [255, 0, 0]); // A circle
         drawCircle(_B.x, _B.y, _r, [255, 0, 0]); // B circle
 
-        const C = {
-          x: _A.x + Math.cos(_cOrDAngle) * _r,
-          y: _A.y + Math.sin(_cOrDAngle) * _r
-        };
+        const C = _C;
 
-        const D = {
-          x: _B.x + Math.cos(_cOrDAngle) * _r,
-          y: _B.y + Math.sin(_cOrDAngle) * _r
-        };
+        const D = _D;
 
         const C2 = {
           x: _A.x + Math.cos(_cOrDAngle2) * _r,
@@ -215,6 +211,7 @@
         ctx.lineTo(size / 2 + Math.floor(D2.x), size / 2 - Math.floor(D2.y));
         ctx.stroke();
 
+        // check if they are valid (when equal to 0)
         //const tmp = (_A.x - _B.x) * (_A.x - C.x) + (_A.y - _B.y) * (_A.y - C.y);
         //console.log(tmp.toString(9));
       }
