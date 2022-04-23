@@ -76,8 +76,8 @@
           .value.slice(1, -1)
           .split(',')
           .map((e) => Number(e));
-        startValues[2] = degToRad(startValues[2]);
-        endValues[2] = degToRad(endValues[2]);
+        startValues[2] = ReedSheepPaths.degToRad(startValues[2]);
+        endValues[2] = ReedSheepPaths.degToRad(endValues[2]);
         const turningRadius = Number(
           document.getElementById('turningRadius').value
         );
@@ -96,8 +96,8 @@
         startCar = _startCar;
         endCar = _endCar;
 
-        const circAMidPoint = getRightCircle(_startCar, turningRadius);
-        const circBMidPoint = getRightCircle(_endCar, turningRadius);
+        const circAMidPoint = ReedSheepPaths.getRightCircle(_startCar, turningRadius);
+        const circBMidPoint = ReedSheepPaths.getRightCircle(_endCar, turningRadius);
 
         _A = circAMidPoint;
         _B = circBMidPoint;
@@ -115,7 +115,7 @@
           circBMidPoint.y.toFixed(2) +
           ' }';
 
-        const vals = getRSR(_startCar, _endCar, turningRadius);
+        const vals = ReedSheepPaths.getRSR(_startCar, _endCar, turningRadius);
         _cOrDAngle = vals.cOrDAngle;
         _cOrDAngle2 = vals.cOrDAngle2;
 
@@ -123,7 +123,7 @@
           vals,
           (key, value) => {
             if (typeof value === 'number' && !key.startsWith('length'))
-              return radToDeg(value).toFixed(2);
+              return ReedSheepPaths.radToDeg(value).toFixed(2);
             else if (typeof value === 'number') return value.toFixed(2);
             else return value;
           },
