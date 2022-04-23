@@ -9,6 +9,7 @@ namespace ReedSheepPaths {
 
   // 0 radiants/0 degree means in generell east/right, no negative values (0 to 360)
   // position (0, 0) is the middle of the field like coordinate system in mathematics
+  // if we look from (0, 0): (1, 0)=0deg; (0, 1)=90deg; (-1, 0)=180deg; (0, -1)=270deg
 
   // #region types
   type pos = { x: number; y: number }; // a position
@@ -74,20 +75,21 @@ namespace ReedSheepPaths {
   ): number {
     /**
      * RSR paths:
-     * car1 is on the circumference of the circle A with radius r and with the middle point circle1
-     * car2 is on the circumference of the circle B with radius r and with the middle point circle2
+     * car1 is on the circumference of the circle A with radius r
+     * car2 is on the circumference of the circle B with radius r
      *
      * we need to search the points C and D, which are on the circumference of A and B respectively
-     * and which are orthogonal to the line of circle1 to circle2
+     * and which are orthogonal to the line of A to B
      * because these are the two arcs we need:
      * car1 goes to C (arc1), then from C to D (CD), and then D to car2 (arc2)
      *
-     * the distance AB (other term for circle1 to circle2) equals to sqrt((y*y)/(x*x))
+     * the distance AB is equals to sqrt((deltaY**2)+(deltaX**2))
      * this distance has the same length as the distance CD
      *
      * now need the arc length of car1 to C (arc1) and car2 to D (arc2)
-     * for that we use the formular: arcLength = centralAngle * r
+     * for that we use the formular: arcLength = innerAngle * r
      *
+     * OLD VERSION:
      * to get the centralAngle we take the angle from car1 to A and C to A and get their absolute difference
      * arctan( slope(carX, circleX) ), but we have to watch out something,
      * if the carX is to the left of the circleX,
