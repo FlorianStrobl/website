@@ -112,12 +112,12 @@ var ReedSheepPaths;
         var innerAngleStartC = startCarToAAngle >= cOrDAngle
             ? startCarToAAngle - cOrDAngle
             : Math.PI * 2 - (cOrDAngle - startCarToAAngle);
-        var innerAngleStartCPrime = Math.PI - innerAngleStartC;
+        var innerAngleStartCPrime = Math.PI * 2 - innerAngleStartC;
         // same for the other side
         var innerAngleDEnd = endCarToBAngle <= cOrDAngle
             ? cOrDAngle - endCarToBAngle
             : Math.PI * 2 - (endCarToBAngle - cOrDAngle);
-        var innerAngleDPrimeEnd = Math.PI - innerAngleDEnd;
+        var innerAngleDPrimeEnd = Math.PI * 2 - innerAngleDEnd;
         // #endregion
         // #region arc lengths
         // arcLength = turningRadius * innerAngle

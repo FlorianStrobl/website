@@ -136,13 +136,13 @@ namespace ReedSheepPaths {
       startCarToAAngle >= cOrDAngle
         ? startCarToAAngle - cOrDAngle
         : Math.PI * 2 - (cOrDAngle - startCarToAAngle);
-    const innerAngleStartCPrime: number = Math.PI - innerAngleStartC;
+    const innerAngleStartCPrime: number = Math.PI * 2 - innerAngleStartC;
     // same for the other side
     const innerAngleDEnd: number =
       endCarToBAngle <= cOrDAngle
         ? cOrDAngle - endCarToBAngle
         : Math.PI * 2 - (endCarToBAngle - cOrDAngle);
-    const innerAngleDPrimeEnd = Math.PI - innerAngleDEnd;
+    const innerAngleDPrimeEnd = Math.PI * 2 - innerAngleDEnd;
     // #endregion
 
     // #region arc lengths
