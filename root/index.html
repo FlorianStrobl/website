@@ -124,7 +124,11 @@
         const outputStr3 = JSON.stringify(
           vals,
           (key, value) => {
-            if (typeof value === 'number' && !key.startsWith('length'))
+            if (
+              typeof value === 'number' &&
+              !key.startsWith('length') &&
+              key.length !== 1
+            )
               return ReedSheepPaths.radToDeg(value).toFixed(2);
             else if (typeof value === 'number') return value.toFixed(2);
             else return value;
