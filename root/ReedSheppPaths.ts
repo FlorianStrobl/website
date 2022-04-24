@@ -133,16 +133,16 @@ namespace ReedSheepPaths {
     // #region get inner angles
     // difference of the two angles, or 360deg - itself
     const innerAngleStartC: number =
-      startCarToAAngle > cOrDAngle
+      startCarToAAngle >= cOrDAngle
         ? startCarToAAngle - cOrDAngle
         : Math.PI * 2 - (cOrDAngle - startCarToAAngle);
-    const innerAngleStartCPrime: number = Math.PI * 2 - innerAngleStartC;
+    const innerAngleStartCPrime: number = Math.PI - innerAngleStartC;
     // same for the other side
     const innerAngleDEnd: number =
-      endCarToBAngle < cOrDAngle
+      endCarToBAngle <= cOrDAngle
         ? cOrDAngle - endCarToBAngle
         : Math.PI * 2 - (endCarToBAngle - cOrDAngle);
-    const innerAngleDPrimeEnd = Math.PI * 2 - innerAngleDEnd;
+    const innerAngleDPrimeEnd = Math.PI - innerAngleDEnd;
     // #endregion
 
     // #region arc lengths

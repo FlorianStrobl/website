@@ -109,15 +109,16 @@ var ReedSheepPaths;
         // #endregion
         // #region get inner angles
         // difference of the two angles, or 360deg - itself
-        var innerAngleStartC = startCarToAAngle > cOrDAngle
+        var innerAngleStartC = startCarToAAngle >= cOrDAngle
             ? startCarToAAngle - cOrDAngle
             : Math.PI * 2 - (cOrDAngle - startCarToAAngle);
-        var innerAngleStartCPrime = Math.PI * 2 - innerAngleStartC;
+        console.log(innerAngleStartC, Math.PI - innerAngleStartC);
+        var innerAngleStartCPrime = Math.PI - innerAngleStartC;
         // same for the other side
-        var innerAngleDEnd = endCarToBAngle < cOrDAngle
+        var innerAngleDEnd = endCarToBAngle <= cOrDAngle
             ? cOrDAngle - endCarToBAngle
             : Math.PI * 2 - (endCarToBAngle - cOrDAngle);
-        var innerAngleDPrimeEnd = Math.PI * 2 - innerAngleDEnd;
+        var innerAngleDPrimeEnd = Math.PI - innerAngleDEnd;
         // #endregion
         // #region arc lengths
         // arcLength = turningRadius * innerAngle
