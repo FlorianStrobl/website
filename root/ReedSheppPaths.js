@@ -140,18 +140,11 @@ var ReedSheepPaths;
             y: B.y + Math.sin(cOrDAngle) * r
         };
         // #endregion
-        // TODO check if it is forwards or backwards
-        console.log('path lengths: ', C, lengthArc1, {
-            x: car1.pos.x + lengthArc1 * Math.cos(car1.heading),
-            y: car1.pos.y + lengthArc1 * Math.sin(car1.heading)
-        }, {
-            x: car1.pos.x - lengthArc1 * Math.cos(car1.heading),
-            y: car1.pos.y - lengthArc1 * Math.sin(car1.heading)
-        }, Math.round(lengthArc1 + lengthArc2 + CD), Math.round(lengthArcPrime1 + lengthArc2 + CD), Math.round(lengthArcPrime2 + lengthArc1 + CD), Math.round(lengthArcPrime1 + lengthArcPrime2 + CD));
         return {
             startCarToAAngle: startCarToAAngle,
             endCarToBAngle: endCarToBAngle,
             cOrDAngle: cOrDAngle,
+            cOrDAngle2: cOrDAngle2,
             innerAngleStartC: innerAngleStartC,
             innerAngleDEnd: innerAngleDEnd,
             innerAngleStartCPrime: innerAngleStartCPrime,
@@ -160,8 +153,8 @@ var ReedSheepPaths;
             lengthArc2: lengthArc2,
             lengthArcPrime1: lengthArcPrime1,
             lengthArcPrime2: lengthArcPrime2,
-            cOrDAngle2: cOrDAngle2,
             lengthTotalDistance: lengthArc1 + CD + lengthArc2,
+            lengthCD: CD,
             A: A,
             B: B,
             C: C,
