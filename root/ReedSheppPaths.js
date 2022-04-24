@@ -140,6 +140,7 @@ var ReedSheepPaths;
             y: B.y + Math.sin(cOrDAngle) * r
         };
         // #endregion
+        console.log('RSR: ', lengthArc1 + CD + lengthArc2, '\nRSr: ', lengthArc1 + CD + lengthArcPrime2, '\nrSR: ', lengthArcPrime1 + CD + lengthArc2, '\nrSr: ', lengthArcPrime1 + CD + lengthArcPrime2);
         return {
             startCarToAAngle: startCarToAAngle,
             endCarToBAngle: endCarToBAngle,
