@@ -112,7 +112,6 @@ var ReedSheepPaths;
         var innerAngleStartC = startCarToAAngle >= cOrDAngle
             ? startCarToAAngle - cOrDAngle
             : Math.PI * 2 - (cOrDAngle - startCarToAAngle);
-        console.log(innerAngleStartC, Math.PI - innerAngleStartC);
         var innerAngleStartCPrime = Math.PI - innerAngleStartC;
         // same for the other side
         var innerAngleDEnd = endCarToBAngle <= cOrDAngle
