@@ -11,9 +11,23 @@ namespace ReedSheepPaths {
   // position (0, 0) is the middle of the field like coordinate system in mathematics
   // if we look from (0, 0): (1, 0)=0deg; (0, 1)=90deg; (-1, 0)=180deg; (0, -1)=270deg
 
-  // #region types
+  // #region types and constants
+  const twoPi: number = Math.PI * 2;
+  const halfPi: number = Math.PI / 2;
+
   type pos = { x: number; y: number }; // a position
   type car = { pos: pos; heading: number }; // a cars values
+
+  enum CSC {
+    RSR,
+    rSR,
+    RSr,
+    rSr,
+    RsR,
+    rsR,
+    Rsr,
+    rsr
+  }
   // #endregion
 
   // #region car data
@@ -25,13 +39,13 @@ namespace ReedSheepPaths {
   // then the RSR path has the length = turningRadius * PI + (|A-B|)
 
   // start values of the car
-  const startCar: car = {
+  export const startCar: car = {
     pos: { x: 0, y: 0 },
     heading: degToRad(0) // 0 is right, 90 is north
   };
   // end/final values of the car
-  const goalCar: car = {
-    pos: { x: 1, y: 1 },
+  export const goalCar: car = {
+    pos: { x: 10, y: 0 },
     heading: degToRad(45)
   };
   // #endregion
@@ -41,11 +55,11 @@ namespace ReedSheepPaths {
     return ((val * 180) / Math.PI) % 360;
   }
   export function degToRad(val: number): number {
-    return ((val * Math.PI) / 180) % (2 * Math.PI);
+    return ((val * Math.PI) / 180) % twoPi;
   }
   function correctRad(val: number): number {
-    if (val < 0) return Math.abs((Math.PI * 2 + val) % (Math.PI * 2));
-    else return Math.abs(val % (Math.PI * 2));
+    if (val < 0) return Math.abs((twoPi + val) % twoPi);
+    else return Math.abs(val % twoPi);
   }
   // #endregion
 
@@ -54,14 +68,14 @@ namespace ReedSheepPaths {
   // (if the car steers to the left, it turns around this point with the distance r)
   function getLeftCircle(car: car, r: number = turningRadius): pos {
     return {
-      x: car.pos.x + r * Math.cos(car.heading + Math.PI / 2),
-      y: car.pos.y + r * Math.sin(car.heading + Math.PI / 2)
+      x: car.pos.x + r * Math.cos(car.heading + halfPi),
+      y: car.pos.y + r * Math.sin(car.heading + halfPi)
     };
   }
   export function getRightCircle(car: car, r: number = turningRadius): pos {
     return {
-      x: car.pos.x - r * Math.cos(car.heading + Math.PI / 2), // rotate the heading by +90deg
-      y: car.pos.y - r * Math.sin(car.heading + Math.PI / 2)
+      x: car.pos.x - r * Math.cos(car.heading + halfPi), // rotate the heading by +90deg
+      y: car.pos.y - r * Math.sin(car.heading + halfPi)
     };
   }
   // #endregion
@@ -100,13 +114,10 @@ namespace ReedSheepPaths {
      * orientation: (1, 0)=0deg; (0, 1)=90deg; (-1, 0)=180deg; (0, -1)=270deg
      */
 
-    // #region circles
+    // #region circles and distances
     // the right cirlces of start car and end car
-    let A: pos = getRightCircle(car1, r);
-    let B: pos = getRightCircle(car2, r);
-    // #endregion
-
-    // #region get linear distances
+    const A: pos = getRightCircle(car1, r);
+    const B: pos = getRightCircle(car2, r);
     // distance between point A and B
     const AB: number = Math.sqrt((A.y - B.y) ** 2 + (A.x - B.x) ** 2);
     const CD: number = AB; // distance CD is the same as the one from AB
@@ -120,70 +131,141 @@ namespace ReedSheepPaths {
     const endCarToBAngle: number = correctRad(
       Math.atan2(car2.pos.y - B.y, car2.pos.x - B.x)
     );
+    const tmpAngle: number = Math.atan2(B.y - A.y, B.x - A.x);
     // the angle around the circle to C or D
-    const cOrDAngle: number = correctRad(
-      Math.atan2(B.y - A.y, B.x - A.x) + Math.PI / 2
-    );
-    // its mirror (NOT C/D Prime' for RSL)
-    const cOrDAngle2: number = correctRad(
-      Math.atan2(B.y - A.y, B.x - A.x) - Math.PI / 2
-    );
-    // #endregion
-
-    // #region get inner angles
-    // difference of the two angles, or 360deg - itself
-    const innerAngleStartC: number =
-      startCarToAAngle >= cOrDAngle
-        ? startCarToAAngle - cOrDAngle
-        : Math.PI * 2 - (cOrDAngle - startCarToAAngle);
-    const innerAngleStartCPrime: number = Math.PI * 2 - innerAngleStartC;
-    // same for the other side
-    const innerAngleDEnd: number =
-      endCarToBAngle <= cOrDAngle
-        ? cOrDAngle - endCarToBAngle
-        : Math.PI * 2 - (endCarToBAngle - cOrDAngle);
-    const innerAngleDPrimeEnd = Math.PI * 2 - innerAngleDEnd;
-    // #endregion
-
-    // #region arc lengths
-    // arcLength = turningRadius * innerAngle
-    // startCar to C
-    const lengthArc1: number = r * correctRad(innerAngleStartC);
-    // D to endCar
-    const lengthArc2: number = r * correctRad(innerAngleDEnd);
-
-    // same but the other way around (forward gets to backwards and vice versa)
-    const lengthArcPrime1: number = r * correctRad(innerAngleStartCPrime);
-    const lengthArcPrime2: number = r * correctRad(innerAngleDPrimeEnd);
+    const cdAngle: number = correctRad(tmpAngle + halfPi);
+    // it's mirror (its simply on the other side) (NOT C/D Prime/' for RSL nor (360deg - cdAngle))
+    const cdMirrorAngle: number = correctRad(tmpAngle - halfPi);
     // #endregion
 
     // #region C and D
     // get the position of C
     const C = {
-      x: A.x + Math.cos(cOrDAngle) * r,
-      y: A.y + Math.sin(cOrDAngle) * r
+      x: A.x + Math.cos(cdAngle) * r,
+      y: A.y + Math.sin(cdAngle) * r
     };
     const D = {
-      x: B.x + Math.cos(cOrDAngle) * r,
-      y: B.y + Math.sin(cOrDAngle) * r
+      x: B.x + Math.cos(cdAngle) * r,
+      y: B.y + Math.sin(cdAngle) * r
     };
     // #endregion
 
-    console.log(
-      'RSR: ',
-      lengthArc1 + CD + lengthArc2,
-      '\nRSr: ',
-      lengthArc1 + CD + lengthArcPrime2,
-      '\nrSR: ',
-      lengthArcPrime1 + CD + lengthArc2,
-      '\nrSr: ',
-      lengthArcPrime1 + CD + lengthArcPrime2
-    );
+    // #region get inner angles
+    // difference of the two angles, (or 360deg - itself for the primes)
+    const innerAngleStartC: number =
+      startCarToAAngle >= cdAngle
+        ? startCarToAAngle - cdAngle
+        : twoPi - (cdAngle - startCarToAAngle);
+    // same for the other side
+    const innerAngleDEnd: number =
+      endCarToBAngle <= cdAngle
+        ? cdAngle - endCarToBAngle
+        : twoPi - (endCarToBAngle - cdAngle);
+    // prime: the other way around (reversing the C part)
+    const innerAngleStartCPrime: number = twoPi - innerAngleStartC;
+    const innerAngleDPrimeEnd = twoPi - innerAngleDEnd;
+
+    const innerAngleStartCMirror: number =
+      startCarToAAngle >= cdMirrorAngle
+        ? startCarToAAngle - cdMirrorAngle
+        : twoPi - (cdMirrorAngle - startCarToAAngle);
+    // same for the other side
+    const innerAngleDMirrorEnd: number =
+      endCarToBAngle <= cdMirrorAngle
+        ? cdMirrorAngle - endCarToBAngle
+        : twoPi - (endCarToBAngle - cdMirrorAngle);
+    // prime: the other way around (when reversing)
+    const innerAngleStartCMirrorPrime: number = twoPi - innerAngleStartCMirror;
+    const innerAngleDMirrorPrimeEnd = twoPi - innerAngleDMirrorEnd;
+    // #endregion
+
+    // #region arc lengths
+    // arcLength = turningRadius * innerAngle
+
+    // startCar to C
+    const lengthArc1: number = r * correctRad(innerAngleStartC);
+    // D to endCar
+    const lengthArc2: number = r * correctRad(innerAngleDEnd);
+
+    // same but the other way around (reversing)
+    const lengthArcPrime1: number = r * correctRad(innerAngleStartCPrime);
+    const lengthArcPrime2: number = r * correctRad(innerAngleDPrimeEnd);
+
+    // startCar to C mirror
+    const lengthArc1Mirror: number = r * correctRad(innerAngleStartCMirror);
+    // D mirror to endCar
+    const lengthArc2Mirror: number = r * correctRad(innerAngleDMirrorEnd);
+
+    // reversing upper paths
+    const lengthArcPrime1Mirror: number =
+      r * correctRad(innerAngleStartCMirrorPrime);
+    const lengthArcPrime2Mirror: number =
+      r * correctRad(innerAngleDMirrorPrimeEnd);
+    // #endregion
+
+    return [
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.RSR,
+        arc1: lengthArc1,
+        straight: CD,
+        arc2: lengthArc2
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.RSr,
+        arc1: lengthArc1,
+        straight: CD,
+        arc2: lengthArcPrime2
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.rSR,
+        arc1: lengthArcPrime1,
+        straight: CD,
+        arc2: lengthArc2
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.rSr,
+        arc1: lengthArcPrime1,
+        straight: CD,
+        arc2: lengthArcPrime2
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.RsR,
+        arc1: lengthArc1Mirror,
+        straight: CD,
+        arc2: lengthArc2Mirror
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.Rsr,
+        arc1: lengthArc1Mirror,
+        straight: CD,
+        arc2: lengthArcPrime2Mirror
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.rsR,
+        arc1: lengthArcPrime1Mirror,
+        straight: CD,
+        arc2: lengthArc2Mirror
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.rsr,
+        arc1: lengthArcPrime1Mirror,
+        straight: CD,
+        arc2: lengthArcPrime2Mirror
+      }
+    ] as unknown as number;
 
     return {
       startCarToAAngle: startCarToAAngle,
       endCarToBAngle: endCarToBAngle,
-      cOrDAngle: cOrDAngle,
+      cOrDAngle: cdAngle,
       innerAngleStartC: innerAngleStartC,
       innerAngleDEnd: innerAngleDEnd,
       lengthArc1: lengthArc1,
@@ -194,13 +276,26 @@ namespace ReedSheepPaths {
       innerAngleDPrimeEnd: innerAngleDPrimeEnd,
       lengthArcPrime1: lengthArcPrime1,
       lengthArcPrime2: lengthArcPrime2,
-      cOrDAngle2: cOrDAngle2,
+      cOrDAngle2: cdMirrorAngle,
       A: A,
       B: B,
       C: C,
       D: D
     } as unknown as number;
-    //return lengthArc1 + CD + lengthArc2;
+  }
+
+  export function getLSL(): {
+    pathType: string;
+    pathTypeValue: string;
+    arc1: number;
+    straight: number;
+    arc2: number;
+  }[] {
+    return [{ x: -1 }] as any;
   }
   // #endregion
 }
+
+console.log(
+  ReedSheepPaths.getRSR(ReedSheepPaths.startCar, ReedSheepPaths.goalCar, 10)
+);
