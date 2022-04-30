@@ -94,6 +94,7 @@
         endCar = _endCar;
         // #endregion
 
+        ReedSheepPaths.debug = true;
         const vals = ReedSheepPaths.getRSR(_startCar, _endCar, turningRadius);
         const vals2 = ReedSheepPaths.getLSL(_startCar, _endCar, turningRadius);
         draw(vals.A, vals.B, vals.C, vals.D, vals.CMirror, vals.DMirror);

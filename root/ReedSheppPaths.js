@@ -13,22 +13,22 @@ var ReedSheepPaths;
     var halfPi = Math.PI / 2;
     var CSC;
     (function (CSC) {
-        CSC[CSC["RSR"] = 0] = "RSR";
-        CSC[CSC["rSR"] = 1] = "rSR";
-        CSC[CSC["RSr"] = 2] = "RSr";
-        CSC[CSC["rSr"] = 3] = "rSr";
-        CSC[CSC["RsR"] = 4] = "RsR";
-        CSC[CSC["rsR"] = 5] = "rsR";
-        CSC[CSC["Rsr"] = 6] = "Rsr";
-        CSC[CSC["rsr"] = 7] = "rsr";
-        CSC[CSC["LSL"] = 8] = "LSL";
-        CSC[CSC["LSl"] = 9] = "LSl";
-        CSC[CSC["lSL"] = 10] = "lSL";
-        CSC[CSC["lSl"] = 11] = "lSl";
-        CSC[CSC["LsL"] = 12] = "LsL";
-        CSC[CSC["Lsl"] = 13] = "Lsl";
-        CSC[CSC["lsL"] = 14] = "lsL";
-        CSC[CSC["lsl"] = 15] = "lsl";
+        CSC["RSR"] = "RSR";
+        CSC["rSR"] = "rSR";
+        CSC["RSr"] = "RSr";
+        CSC["rSr"] = "rSr";
+        CSC["RsR"] = "RsR";
+        CSC["rsR"] = "rsR";
+        CSC["Rsr"] = "Rsr";
+        CSC["rsr"] = "rsr";
+        CSC["LSL"] = "LSL";
+        CSC["LSl"] = "LSl";
+        CSC["lSL"] = "lSL";
+        CSC["lSl"] = "lSl";
+        CSC["LsL"] = "LsL";
+        CSC["Lsl"] = "Lsl";
+        CSC["lsL"] = "lsL";
+        CSC["lsl"] = "lsl";
     })(CSC || (CSC = {}));
     // #endregion
     // #region car data
@@ -192,29 +192,7 @@ var ReedSheepPaths;
         var lengthArcPrime1Mirror = r * correctRad(innerAngleStartCMirrorPrime);
         var lengthArcPrime2Mirror = r * correctRad(innerAngleDMirrorPrimeEnd);
         // #endregion
-        return {
-            startCarToAAngle: startCarToAAngle,
-            endCarToBAngle: endCarToBAngle,
-            cOrDAngle: cdAngle,
-            innerAngleStartC: innerAngleStartC,
-            innerAngleDEnd: innerAngleDEnd,
-            lengthArc1: lengthArc1,
-            lengthArc2: lengthArc2,
-            lengthCD: CD,
-            lengthTotalDistance: lengthArc1 + CD + lengthArc2,
-            innerAngleStartCPrime: innerAngleStartCPrime,
-            innerAngleDPrimeEnd: innerAngleDPrimeEnd,
-            lengthArcPrime1: lengthArcPrime1,
-            lengthArcPrime2: lengthArcPrime2,
-            cOrDAngle2: cdMirrorAngle,
-            A: A,
-            B: B,
-            C: C,
-            D: D,
-            CMirror: CMirror,
-            DMirror: DMirror
-        };
-        return [
+        var result = [
             {
                 pathType: 'CSC',
                 pathTypeValue: CSC.RSR,
@@ -271,7 +249,31 @@ var ReedSheepPaths;
                 straight: CD,
                 arc2: lengthArcPrime2Mirror
             }
-        ];
+        ].sort(function (a, b) { return a.arc1 + a.arc2 - (b.arc1 + b.arc2); });
+        console.log(result);
+        return {
+            startCarToAAngle: startCarToAAngle,
+            endCarToBAngle: endCarToBAngle,
+            cOrDAngle: cdAngle,
+            innerAngleStartC: innerAngleStartC,
+            innerAngleDEnd: innerAngleDEnd,
+            lengthArc1: lengthArc1,
+            lengthArc2: lengthArc2,
+            lengthCD: CD,
+            lengthTotalDistance: lengthArc1 + CD + lengthArc2,
+            innerAngleStartCPrime: innerAngleStartCPrime,
+            innerAngleDPrimeEnd: innerAngleDPrimeEnd,
+            lengthArcPrime1: lengthArcPrime1,
+            lengthArcPrime2: lengthArcPrime2,
+            cOrDAngle2: cdMirrorAngle,
+            A: A,
+            B: B,
+            C: C,
+            D: D,
+            CMirror: CMirror,
+            DMirror: DMirror
+        };
+        return result;
     }
     ReedSheepPaths.getRSR = getRSR;
     function getLSL(car1, car2, r) {
@@ -355,6 +357,65 @@ var ReedSheepPaths;
         var lengthArcPrime1Mirror = r * correctRad(innerAngleStartCMirrorPrime);
         var lengthArcPrime2Mirror = r * correctRad(innerAngleDMirrorPrimeEnd);
         // #endregion
+        var result = [
+            {
+                pathType: 'CSC',
+                pathTypeValue: CSC.LSL,
+                arc1: lengthArc1,
+                straight: CD,
+                arc2: lengthArc2
+            },
+            {
+                pathType: 'CSC',
+                pathTypeValue: CSC.LSl,
+                arc1: lengthArc1,
+                straight: CD,
+                arc2: lengthArcPrime2
+            },
+            {
+                pathType: 'CSC',
+                pathTypeValue: CSC.lSL,
+                arc1: lengthArcPrime1,
+                straight: CD,
+                arc2: lengthArc2
+            },
+            {
+                pathType: 'CSC',
+                pathTypeValue: CSC.lSl,
+                arc1: lengthArcPrime1,
+                straight: CD,
+                arc2: lengthArcPrime2
+            },
+            {
+                pathType: 'CSC',
+                pathTypeValue: CSC.LsL,
+                arc1: lengthArc1Mirror,
+                straight: CD,
+                arc2: lengthArc2Mirror
+            },
+            {
+                pathType: 'CSC',
+                pathTypeValue: CSC.Lsl,
+                arc1: lengthArc1Mirror,
+                straight: CD,
+                arc2: lengthArcPrime2Mirror
+            },
+            {
+                pathType: 'CSC',
+                pathTypeValue: CSC.lsL,
+                arc1: lengthArcPrime1Mirror,
+                straight: CD,
+                arc2: lengthArc2Mirror
+            },
+            {
+                pathType: 'CSC',
+                pathTypeValue: CSC.lsl,
+                arc1: lengthArcPrime1Mirror,
+                straight: CD,
+                arc2: lengthArcPrime2Mirror
+            }
+        ].sort(function (a, b) { return a.arc1 + a.arc2 - (b.arc1 + b.arc2); });
+        console.log(result);
         return {
             startCarToAAngle: startCarToAAngle,
             endCarToBAngle: endCarToBAngle,
@@ -377,64 +438,7 @@ var ReedSheepPaths;
             CMirror: CMirror,
             DMirror: DMirror
         };
-        return [
-            {
-                pathType: 'CSC',
-                pathTypeValue: CSC.RSR,
-                arc1: lengthArc1,
-                straight: CD,
-                arc2: lengthArc2
-            },
-            {
-                pathType: 'CSC',
-                pathTypeValue: CSC.RSr,
-                arc1: lengthArc1,
-                straight: CD,
-                arc2: lengthArcPrime2
-            },
-            {
-                pathType: 'CSC',
-                pathTypeValue: CSC.rSR,
-                arc1: lengthArcPrime1,
-                straight: CD,
-                arc2: lengthArc2
-            },
-            {
-                pathType: 'CSC',
-                pathTypeValue: CSC.rSr,
-                arc1: lengthArcPrime1,
-                straight: CD,
-                arc2: lengthArcPrime2
-            },
-            {
-                pathType: 'CSC',
-                pathTypeValue: CSC.RsR,
-                arc1: lengthArc1Mirror,
-                straight: CD,
-                arc2: lengthArc2Mirror
-            },
-            {
-                pathType: 'CSC',
-                pathTypeValue: CSC.Rsr,
-                arc1: lengthArc1Mirror,
-                straight: CD,
-                arc2: lengthArcPrime2Mirror
-            },
-            {
-                pathType: 'CSC',
-                pathTypeValue: CSC.rsR,
-                arc1: lengthArcPrime1Mirror,
-                straight: CD,
-                arc2: lengthArc2Mirror
-            },
-            {
-                pathType: 'CSC',
-                pathTypeValue: CSC.rsr,
-                arc1: lengthArcPrime1Mirror,
-                straight: CD,
-                arc2: lengthArcPrime2Mirror
-            }
-        ];
+        return result;
     }
     ReedSheepPaths.getLSL = getLSL;
     // #endregion

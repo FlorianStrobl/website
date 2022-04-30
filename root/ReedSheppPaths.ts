@@ -2,6 +2,8 @@
 // Implementation of Reed and Shepps Curves/Paths
 
 namespace ReedSheepPaths {
+  let debug: boolean = false;
+
   // conventions:
 
   // L: left-forward, R: right-forward, S: straight-forward,
@@ -18,24 +20,14 @@ namespace ReedSheepPaths {
   type pos = { x: number; y: number }; // a position
   type car = { pos: pos; heading: number }; // a cars values
 
-  enum CSC {
-    RSR,
-    rSR,
-    RSr,
-    rSr,
-    RsR,
-    rsR,
-    Rsr,
-    rsr,
-    LSL,
-    LSl,
-    lSL,
-    lSl,
-    LsL,
-    Lsl,
-    lsL,
-    lsl
-  }
+  type path = {
+    pathType: string;
+    pathTypeValue: string;
+    arc1: number;
+    straight: number;
+    arc2: number;
+  };
+
   // #endregion
 
   // #region car data
@@ -94,7 +86,7 @@ namespace ReedSheepPaths {
     car1: car = startCar,
     car2: car = goalCar,
     r: number = turningRadius
-  ): number {
+  ): path[] {
     /**
      * RSR paths:
      * car1 is on the circumference of the circle A with radius r
@@ -219,100 +211,99 @@ namespace ReedSheepPaths {
       r * correctRad(innerAngleDMirrorPrimeEnd);
     // #endregion
 
-    return {
-      startCarToAAngle: startCarToAAngle,
-      endCarToBAngle: endCarToBAngle,
-      cOrDAngle: cdAngle,
-      innerAngleStartC: innerAngleStartC,
-      innerAngleDEnd: innerAngleDEnd,
-      lengthArc1: lengthArc1,
-      lengthArc2: lengthArc2,
-      lengthCD: CD,
-      lengthTotalDistance: lengthArc1 + CD + lengthArc2,
-      innerAngleStartCPrime: innerAngleStartCPrime,
-      innerAngleDPrimeEnd: innerAngleDPrimeEnd,
-      lengthArcPrime1: lengthArcPrime1,
-      lengthArcPrime2: lengthArcPrime2,
-      cOrDAngle2: cdMirrorAngle,
-      A: A,
-      B: B,
-      C: C,
-      D: D,
-      CMirror: CMirror,
-      DMirror: DMirror
-    } as unknown as number;
-
-    return [
+    const result: path[] = [
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.RSR,
+        pathTypeValue: 'RSR',
         arc1: lengthArc1,
         straight: CD,
         arc2: lengthArc2
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.RSr,
+        pathTypeValue: 'RSr',
         arc1: lengthArc1,
         straight: CD,
         arc2: lengthArcPrime2
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.rSR,
+        pathTypeValue: 'rSR',
         arc1: lengthArcPrime1,
         straight: CD,
         arc2: lengthArc2
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.rSr,
+        pathTypeValue: 'rSr',
         arc1: lengthArcPrime1,
         straight: CD,
         arc2: lengthArcPrime2
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.RsR,
+        pathTypeValue: 'RsR',
         arc1: lengthArc1Mirror,
         straight: CD,
         arc2: lengthArc2Mirror
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.Rsr,
+        pathTypeValue: 'Rsr',
         arc1: lengthArc1Mirror,
         straight: CD,
         arc2: lengthArcPrime2Mirror
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.rsR,
+        pathTypeValue: 'rsR',
         arc1: lengthArcPrime1Mirror,
         straight: CD,
         arc2: lengthArc2Mirror
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.rsr,
+        pathTypeValue: 'rsr',
         arc1: lengthArcPrime1Mirror,
         straight: CD,
         arc2: lengthArcPrime2Mirror
       }
-    ] as unknown as number;
+    ];
+
+    // console.log(result);
+
+    if (debug) {
+      return {
+        // @ts-ignore
+        startCarToAAngle: startCarToAAngle,
+        endCarToBAngle: endCarToBAngle,
+        cOrDAngle: cdAngle,
+        innerAngleStartC: innerAngleStartC,
+        innerAngleDEnd: innerAngleDEnd,
+        lengthArc1: lengthArc1,
+        lengthArc2: lengthArc2,
+        lengthCD: CD,
+        lengthTotalDistance: lengthArc1 + CD + lengthArc2,
+        innerAngleStartCPrime: innerAngleStartCPrime,
+        innerAngleDPrimeEnd: innerAngleDPrimeEnd,
+        lengthArcPrime1: lengthArcPrime1,
+        lengthArcPrime2: lengthArcPrime2,
+        cOrDAngle2: cdMirrorAngle,
+        A: A,
+        B: B,
+        C: C,
+        D: D,
+        CMirror: CMirror,
+        DMirror: DMirror
+      };
+    } else return result;
   }
 
   export function getLSL(
     car1: car = startCar,
     car2: car = goalCar,
     r: number = turningRadius
-  ): {
-    pathType: string;
-    pathTypeValue: string;
-    arc1: number;
-    straight: number;
-    arc2: number;
-  }[] {
+  ): path[] {
     // #region circles and distances
     // the right cirlces of start car and end car
     const A: pos = getLeftCircle(car1, r);
@@ -410,91 +401,113 @@ namespace ReedSheepPaths {
       r * correctRad(innerAngleDMirrorPrimeEnd);
     // #endregion
 
-    return {
-      startCarToAAngle: startCarToAAngle,
-      endCarToBAngle: endCarToBAngle,
-      cOrDAngle: cdAngle,
-      innerAngleStartC: innerAngleStartC,
-      innerAngleDEnd: innerAngleDEnd,
-      lengthArc1: lengthArc1,
-      lengthArc2: lengthArc2,
-      lengthCD: CD,
-      lengthTotalDistance: lengthArc1 + CD + lengthArc2,
-      innerAngleStartCPrime: innerAngleStartCPrime,
-      innerAngleDPrimeEnd: innerAngleDPrimeEnd,
-      lengthArcPrime1: lengthArcPrime1,
-      lengthArcPrime2: lengthArcPrime2,
-      cOrDAngle2: cdMirrorAngle,
-      A: A,
-      B: B,
-      C: C,
-      D: D,
-      CMirror: CMirror,
-      DMirror: DMirror
-    } as any;
-
-    return [
+    const result: path[] = [
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.RSR,
+        pathTypeValue: 'LSL',
         arc1: lengthArc1,
         straight: CD,
         arc2: lengthArc2
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.RSr,
+        pathTypeValue: 'LSl',
         arc1: lengthArc1,
         straight: CD,
         arc2: lengthArcPrime2
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.rSR,
+        pathTypeValue: 'lSL',
         arc1: lengthArcPrime1,
         straight: CD,
         arc2: lengthArc2
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.rSr,
+        pathTypeValue: 'lSl',
         arc1: lengthArcPrime1,
         straight: CD,
         arc2: lengthArcPrime2
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.RsR,
+        pathTypeValue: 'LsL',
         arc1: lengthArc1Mirror,
         straight: CD,
         arc2: lengthArc2Mirror
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.Rsr,
+        pathTypeValue: 'Lsl',
         arc1: lengthArc1Mirror,
         straight: CD,
         arc2: lengthArcPrime2Mirror
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.rsR,
+        pathTypeValue: 'lsL',
         arc1: lengthArcPrime1Mirror,
         straight: CD,
         arc2: lengthArc2Mirror
       },
       {
         pathType: 'CSC',
-        pathTypeValue: CSC.rsr,
+        pathTypeValue: 'lsl',
         arc1: lengthArcPrime1Mirror,
         straight: CD,
         arc2: lengthArcPrime2Mirror
       }
-    ] as any;
+    ];
+
+    // console.log(result);
+
+    if (debug) {
+      return {
+        // @ts-ignore
+        startCarToAAngle: startCarToAAngle,
+        endCarToBAngle: endCarToBAngle,
+        cOrDAngle: cdAngle,
+        innerAngleStartC: innerAngleStartC,
+        innerAngleDEnd: innerAngleDEnd,
+        lengthArc1: lengthArc1,
+        lengthArc2: lengthArc2,
+        lengthCD: CD,
+        lengthTotalDistance: lengthArc1 + CD + lengthArc2,
+        innerAngleStartCPrime: innerAngleStartCPrime,
+        innerAngleDPrimeEnd: innerAngleDPrimeEnd,
+        lengthArcPrime1: lengthArcPrime1,
+        lengthArcPrime2: lengthArcPrime2,
+        cOrDAngle2: cdMirrorAngle,
+        A: A,
+        B: B,
+        C: C,
+        D: D,
+        CMirror: CMirror,
+        DMirror: DMirror
+      };
+    } else return result;
+  }
+
+  export function getCSCPaths(
+    car1: car = startCar,
+    car2: car = goalCar,
+    r: number = turningRadius
+  ): path[] {
+    const rsrPaths: path[] = getRSR(car1, car2, r);
+    const lslPaths: path[] = getLSL(car1, car2, r);
+    const paths: path[] = [...rsrPaths, ...lslPaths].sort(
+      (a, b) => a.arc1 + a.arc2 - (b.arc1 + b.arc2)
+    );
+    return paths;
   }
   // #endregion
 }
 
-// console.log(
-//   ReedSheepPaths.getRSR(ReedSheepPaths.startCar, ReedSheepPaths.goalCar, 10)
-// );
+console.log(
+  ReedSheepPaths.getCSCPaths(
+    ReedSheepPaths.startCar,
+    ReedSheepPaths.goalCar,
+    10
+  )
+);
