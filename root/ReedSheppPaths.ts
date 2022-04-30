@@ -26,7 +26,15 @@ namespace ReedSheepPaths {
     RsR,
     rsR,
     Rsr,
-    rsr
+    rsr,
+    LSL,
+    LSl,
+    lSL,
+    lSl,
+    LsL,
+    Lsl,
+    lsL,
+    lsl
   }
   // #endregion
 
@@ -148,6 +156,14 @@ namespace ReedSheepPaths {
       x: B.x + Math.cos(cdAngle) * r,
       y: B.y + Math.sin(cdAngle) * r
     };
+    const CMirror = {
+      x: A.x + Math.cos(cdMirrorAngle) * r,
+      y: A.y + Math.sin(cdMirrorAngle) * r
+    };
+    const DMirror = {
+      x: B.x + Math.cos(cdMirrorAngle) * r,
+      y: B.y + Math.sin(cdMirrorAngle) * r
+    };
     // #endregion
 
     // #region get inner angles
@@ -202,6 +218,29 @@ namespace ReedSheepPaths {
     const lengthArcPrime2Mirror: number =
       r * correctRad(innerAngleDMirrorPrimeEnd);
     // #endregion
+
+    return {
+      startCarToAAngle: startCarToAAngle,
+      endCarToBAngle: endCarToBAngle,
+      cOrDAngle: cdAngle,
+      innerAngleStartC: innerAngleStartC,
+      innerAngleDEnd: innerAngleDEnd,
+      lengthArc1: lengthArc1,
+      lengthArc2: lengthArc2,
+      lengthCD: CD,
+      lengthTotalDistance: lengthArc1 + CD + lengthArc2,
+      innerAngleStartCPrime: innerAngleStartCPrime,
+      innerAngleDPrimeEnd: innerAngleDPrimeEnd,
+      lengthArcPrime1: lengthArcPrime1,
+      lengthArcPrime2: lengthArcPrime2,
+      cOrDAngle2: cdMirrorAngle,
+      A: A,
+      B: B,
+      C: C,
+      D: D,
+      CMirror: CMirror,
+      DMirror: DMirror
+    } as unknown as number;
 
     return [
       {
@@ -261,6 +300,115 @@ namespace ReedSheepPaths {
         arc2: lengthArcPrime2Mirror
       }
     ] as unknown as number;
+  }
+
+  export function getLSL(
+    car1: car = startCar,
+    car2: car = goalCar,
+    r: number = turningRadius
+  ): {
+    pathType: string;
+    pathTypeValue: string;
+    arc1: number;
+    straight: number;
+    arc2: number;
+  }[] {
+    // #region circles and distances
+    // the right cirlces of start car and end car
+    const A: pos = getLeftCircle(car1, r);
+    const B: pos = getLeftCircle(car2, r);
+    // distance between point A and B
+    const AB: number = Math.sqrt((A.y - B.y) ** 2 + (A.x - B.x) ** 2);
+    const CD: number = AB; // distance CD is the same as the one from AB
+    // #endregion
+
+    // #region get simple (outer) angles
+    // the angle the car has to the circle if you trace around the circumference
+    const startCarToAAngle: number = correctRad(
+      Math.atan2(car1.pos.y - A.y, car1.pos.x - A.x)
+    );
+    const endCarToBAngle: number = correctRad(
+      Math.atan2(car2.pos.y - B.y, car2.pos.x - B.x)
+    );
+    const tmpAngle: number = Math.atan2(B.y - A.y, B.x - A.x);
+    // the angle around the circle to C or D
+    const cdAngle: number = correctRad(tmpAngle - halfPi);
+    // it's mirror (its simply on the other side) (NOT C/D Prime/' for RSL nor (360deg - cdAngle))
+    const cdMirrorAngle: number = correctRad(tmpAngle + halfPi);
+    // #endregion
+
+    // #region C and D
+    // get the position of C
+    const C = {
+      x: A.x + Math.cos(cdAngle) * r,
+      y: A.y + Math.sin(cdAngle) * r
+    };
+    const D = {
+      x: B.x + Math.cos(cdAngle) * r,
+      y: B.y + Math.sin(cdAngle) * r
+    };
+    const CMirror = {
+      x: A.x + Math.cos(cdMirrorAngle) * r,
+      y: A.y + Math.sin(cdMirrorAngle) * r
+    };
+    const DMirror = {
+      x: B.x + Math.cos(cdMirrorAngle) * r,
+      y: B.y + Math.sin(cdMirrorAngle) * r
+    };
+    // #endregion
+
+    // #region get inner angles
+    // difference of the two angles, (or 360deg - itself for the primes)
+    const innerAngleStartC: number =
+      startCarToAAngle >= cdAngle
+        ? twoPi - (startCarToAAngle - cdAngle)
+        : cdAngle - startCarToAAngle;
+    // same for the other side
+    const innerAngleDEnd: number =
+      endCarToBAngle <= cdAngle
+        ? twoPi - (cdAngle - endCarToBAngle)
+        : endCarToBAngle - cdAngle;
+    // prime: the other way around (reversing the C part)
+    const innerAngleStartCPrime: number = twoPi - innerAngleStartC;
+    const innerAngleDPrimeEnd = twoPi - innerAngleDEnd;
+
+    const innerAngleStartCMirror: number =
+      startCarToAAngle >= cdMirrorAngle
+        ? twoPi - (startCarToAAngle - cdMirrorAngle)
+        : cdMirrorAngle - startCarToAAngle;
+    // same for the other side
+    const innerAngleDMirrorEnd: number =
+      endCarToBAngle <= cdMirrorAngle
+        ? twoPi - (cdMirrorAngle - endCarToBAngle)
+        : endCarToBAngle - cdMirrorAngle;
+    // prime: the other way around (when reversing)
+    const innerAngleStartCMirrorPrime: number = twoPi - innerAngleStartCMirror;
+    const innerAngleDMirrorPrimeEnd = twoPi - innerAngleDMirrorEnd;
+    // #endregion
+
+    // #region arc lengths
+    // arcLength = turningRadius * innerAngle
+
+    // startCar to C
+    const lengthArc1: number = r * correctRad(innerAngleStartC);
+    // D to endCar
+    const lengthArc2: number = r * correctRad(innerAngleDEnd);
+
+    // same but the other way around (reversing)
+    const lengthArcPrime1: number = r * correctRad(innerAngleStartCPrime);
+    const lengthArcPrime2: number = r * correctRad(innerAngleDPrimeEnd);
+
+    // startCar to C mirror
+    const lengthArc1Mirror: number = r * correctRad(innerAngleStartCMirror);
+    // D mirror to endCar
+    const lengthArc2Mirror: number = r * correctRad(innerAngleDMirrorEnd);
+
+    // reversing upper paths
+    const lengthArcPrime1Mirror: number =
+      r * correctRad(innerAngleStartCMirrorPrime);
+    const lengthArcPrime2Mirror: number =
+      r * correctRad(innerAngleDMirrorPrimeEnd);
+    // #endregion
 
     return {
       startCarToAAngle: startCarToAAngle,
@@ -280,22 +428,73 @@ namespace ReedSheepPaths {
       A: A,
       B: B,
       C: C,
-      D: D
-    } as unknown as number;
-  }
+      D: D,
+      CMirror: CMirror,
+      DMirror: DMirror
+    } as any;
 
-  export function getLSL(): {
-    pathType: string;
-    pathTypeValue: string;
-    arc1: number;
-    straight: number;
-    arc2: number;
-  }[] {
-    return [{ x: -1 }] as any;
+    return [
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.RSR,
+        arc1: lengthArc1,
+        straight: CD,
+        arc2: lengthArc2
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.RSr,
+        arc1: lengthArc1,
+        straight: CD,
+        arc2: lengthArcPrime2
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.rSR,
+        arc1: lengthArcPrime1,
+        straight: CD,
+        arc2: lengthArc2
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.rSr,
+        arc1: lengthArcPrime1,
+        straight: CD,
+        arc2: lengthArcPrime2
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.RsR,
+        arc1: lengthArc1Mirror,
+        straight: CD,
+        arc2: lengthArc2Mirror
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.Rsr,
+        arc1: lengthArc1Mirror,
+        straight: CD,
+        arc2: lengthArcPrime2Mirror
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.rsR,
+        arc1: lengthArcPrime1Mirror,
+        straight: CD,
+        arc2: lengthArc2Mirror
+      },
+      {
+        pathType: 'CSC',
+        pathTypeValue: CSC.rsr,
+        arc1: lengthArcPrime1Mirror,
+        straight: CD,
+        arc2: lengthArcPrime2Mirror
+      }
+    ] as any;
   }
   // #endregion
 }
 
-console.log(
-  ReedSheepPaths.getRSR(ReedSheepPaths.startCar, ReedSheepPaths.goalCar, 10)
-);
+// console.log(
+//   ReedSheepPaths.getRSR(ReedSheepPaths.startCar, ReedSheepPaths.goalCar, 10)
+// );
