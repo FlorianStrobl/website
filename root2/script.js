@@ -7,7 +7,7 @@ const ctx = canvas.getContext('2d');
 // #endregion
 
 // #region vars
-let targets = []; // goal
+let targets = []; // [pos1, pos2, name, color][]
 let resetTargets = []; // for "z" and "y"
 let elementIDCounter = 0;
 let eraseMode = false; // delete targets instead of creating them
@@ -39,7 +39,7 @@ document.addEventListener('keydown', (e) => {
         resetCanvas(); // reset canvas and draw all the targets again
         drawTargets();
 
-        visualizeTargets(targets); // ouput the outer HTML
+        visualizeTargets(); // ouput the outer HTML
       }
       break;
     case 89: // "y"
@@ -56,7 +56,7 @@ document.addEventListener('keydown', (e) => {
         resetCanvas(); // reset canvas and draw all the targets again
         drawTargets();
 
-        visualizeTargets(targets); // ouput the outer HTML
+        visualizeTargets(); // ouput the outer HTML
       }
       break;
   }
@@ -128,9 +128,15 @@ canvas.addEventListener('mouseup', (e) => {
   // onCreate()
   drawNewTarget(getAbsCoordinates(e)); // draw the new target
 
-  targets.push([pos1, getAbsCoordinates(e), elementIDCounter.toString()]);
+  // pos1, pos2, name, color
+  targets.push([
+    pos1,
+    getAbsCoordinates(e),
+    elementIDCounter.toString(),
+    [10, 10, 10]
+  ]);
   elementIDCounter++;
-  visualizeTargets(targets);
+  visualizeTargets();
 
   pos1 = { x: -1, y: -1 }; // reset position for next target
 });
@@ -174,28 +180,28 @@ function resetCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function visualizeTargets(objects) {
-  let elements = document.getElementById('elements');
+function onInputFieldChange() {
+  console.log('input field change');
+  const elements = document.getElementById('elements');
 
-  const elementsChildren = document.getElementById('elements').children;
+  const oldNames = elements.innerHTML.matchAll(/value="(.*?)"/g);
+  console.clear();
+  for (const c of oldNames) console.log('Names: ', c[1]);
+}
 
-  for (let i = 0; i < elementsChildren.length; i++) {
-    const elementsChildren = document.getElementById('elements').children;
-    let child = elementsChildren[i];
-    console.log(child.children[0].children[0]);
+function visualizeTargets() {
+  const elements = document.getElementById('elements');
 
-    //child = children[i];
-    //console.log(child.children[0].children[0].value.toString());
-    //targets[i][2] = child.children[0].children[0].value.toString();
-    //console.log(child.children[0].children[0].value);
-  }
+  // update all the names before
+  //const oldNames = elements.innerHTML.matchAll(/value="(.*?)"/g);
+  //for (const c of oldNames) console.log('Old names: ', c[1]);
 
   let result = '';
   let x = 0;
 
   //Pass through all child to get the name
 
-  for (const object of objects) {
+  for (const target of targets) {
     result +=
       `<div
 
@@ -210,8 +216,8 @@ function visualizeTargets(objects) {
           >
           <div style="display: flex;">
             <input value="` +
-      object[2] +
-      `"></input>
+      target[2] +
+      `" onchange="onInputFieldChange()"></input>
             <button id=id-` +
       x +
       `  onclick="deleteElement(` +
@@ -221,14 +227,14 @@ function visualizeTargets(objects) {
             <hr / style="margin-bottom: -10px;">
             <p>
               [{x:` +
-      object[0].x.toString() +
+      target[0].x.toString() +
       `, y: ` +
-      object[0].y.toString() +
+      target[0].y.toString() +
       `} <br />
               {x:` +
-      object[1].x +
+      target[1].x +
       `, y: ` +
-      object[1].y +
+      target[1].y +
       `}]
             </p>
           </div>
@@ -240,9 +246,9 @@ function visualizeTargets(objects) {
 }
 
 function deleteElement(id) {
-  console.log('Delete' + id);
   targets = targets.filter((_, i) => i !== id);
-  visualizeTargets(targets);
+  resetCanvas();
+  visualizeTargets();
   drawTargets();
 }
 // #endregion
