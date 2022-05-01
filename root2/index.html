@@ -1,0 +1,38 @@
+<html>
+  <body>
+    <div id="xy" style="margin-bottom: 20px">X : - , Y : -</div>
+    <p id="mode">Create mode</p>
+    <div style="display: flex">
+      <canvas
+        id="canvas"
+        width="5040"
+        height="2438"
+        style="
+          border: 1px solid #d3d3d3;
+          background-image: url('Feld_High_Res.png');
+          background-size: 100% 100%;
+          transform: scale(0.3, 0.3); /* Equal to scaleX(2) scaleY(0.5) */
+          transform-origin: left top;
+        "
+      ></canvas>
+      <div
+        style="
+          margin-left: -3500px;
+          border-style: solid;
+          height: 725px;
+          width: 1000px;
+        "
+      >
+        <p style="text-align: center; height: 30px; font-size: 30px">
+          Elements:
+        </p>
+
+        <hr />
+        <div id="elements" style="overflow-y: scroll; height: 600px"></div>
+      </div>
+
+      <p style="margin-left: 100px"></p>
+    </div>
+  </body>
+  <script type="text/javascript" src="script.js"></script>
+</html>
