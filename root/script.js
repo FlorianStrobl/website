@@ -44,8 +44,15 @@ function run() {
   ReedSheepPaths.debug = true;
   const vals = ReedSheepPaths.getRSR(_startCar, _endCar, turningRadius);
   const vals2 = ReedSheepPaths.getLSL(_startCar, _endCar, turningRadius);
-  draw(vals.A, vals.B, vals.C, vals.D, vals.CMirror, vals.DMirror);
-  draw(vals2.A, vals2.B, vals2.C, vals2.D, vals2.CMirror, vals2.DMirror);
+  updateScreen(vals.A, vals.B, vals.C, vals.D, vals.CMirror, vals.DMirror);
+  updateScreen(
+    vals2.A,
+    vals2.B,
+    vals2.C,
+    vals2.D,
+    vals2.CMirror,
+    vals2.DMirror
+  );
 
   const outputStr1 =
     'Right circle from start car middle point: { x: ' +
@@ -112,7 +119,7 @@ const drawLine = (_x, _y) => {
   ctx.stroke();
 };
 
-function draw(__A, __B, __C, __D, __CMirror, __DMirror) {
+function updateScreen(__A, __B, __C, __D, __CMirror, __DMirror) {
   //clearScreen();
 
   setPixel(startCar.pos.x, startCar.pos.y, [255, 0, 0]); // start car
@@ -155,6 +162,7 @@ function draw(__A, __B, __C, __D, __CMirror, __DMirror) {
 }
 
 function clearScreen() {
+  // TODO ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let y = 0; y < canvas.height; ++y)
     for (let x = 0; x < canvas.width; ++x) setPixel(x, y, [255, 255, 255]);
 }

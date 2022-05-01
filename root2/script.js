@@ -7,54 +7,41 @@ const rect = canvas.getBoundingClientRect();
 // #endregion
 
 // #region vars
+let eraseMode = false; // delete targets instead of creating them
 let targets = []; // [pos1, pos2, name, color][]
 let resetTargets = []; // for "z" and "y"
 let elementIDCounter = 0;
-let eraseMode = false; // delete targets instead of creating them
 
-let pos1 = { x: -1, y: -1 };
+let lastPos = { x: -1, y: -1 };
 // #endregion
 
 // #region event listeners
-// key modifier: "e" and "z"
+// key modifier: "e", "z" and "y"
 document.addEventListener('keydown', (e) => {
-  const md = () => (eraseMode ? 'Erase mode' : 'Create mode');
+  const getModeStr = () => (eraseMode ? 'Erase mode' : 'Create mode');
+
   switch (e.keyCode) {
     case 69: // "e"
-      eraseMode = !eraseMode; // go into erase mode
-      if (eraseMode) document.getElementById('mode').innerHTML = md();
-      else document.getElementById('mode').innerHTML = md();
+      eraseMode = !eraseMode; // switch erase mode
+      // update the titel
+      document.getElementById('mode').innerHTML = getModeStr();
       break;
     case 90: // "z"
-      if (!eraseMode) {
-        deleteObstacle(targets[targets.length - 1][2]);
-        const val = targets.pop();
-        if (val !== undefined) {
-          resetTargets.push(val); // delete last target and save it for "y"
-        }
-        resetCanvas(); // reset canvas and draw all the targets again
-        drawTargets();
-
-        visualizeTargets(); // ouput the outer HTML
-      }
+      deleteTarget(targets[targets.length - 1][2]); // delete the last target
+      updateScreen(); // redraw everything
       break;
     case 89: // "y"
-      if (!eraseMode) {
-        const val = resetTargets.pop();
-        if (val !== undefined) {
-          targets.push(val); // delete last target and save it for "y"
-          document.getElementById('mode').innerHTML =
-            md() + ' - Restored last deleted obstacle';
-          setTimeout(() => {
-            document.getElementById('mode').innerHTML = md();
-          }, 2000);
-        }
-
-        resetCanvas(); // reset canvas and draw all the targets again
-        drawTargets();
-
-        visualizeTargets(); // ouput the outer HTML
+      const val = resetTargets.pop();
+      if (val !== undefined) {
+        // an element can be restored
+        targets.push(val); // readd the target
+        document.getElementById('mode').innerHTML =
+          getModeStr() + ' - Restored last deleted obstacle';
+        setTimeout(() => {
+          document.getElementById('mode').innerHTML = getModeStr();
+        }, 2000);
       }
+      updateScreen();
       break;
   }
 });
@@ -62,26 +49,33 @@ document.addEventListener('keydown', (e) => {
 canvas.addEventListener('mousemove', (e) => {
   // set titel to current coords
   document.getElementById('xy').innerHTML =
-    ' : ' +
     getAbsCoordinates(e).x.toFixed(1) +
     'px , y: ' +
     (canvas.height - getAbsCoordinates(e).y).toFixed(1) +
     ' px';
 
-  if (eraseMode || pos1.x == -1) return;
+  if (eraseMode || lastPos.x == -1) return;
 
-  resetCanvas();
-  drawNewTarget(getAbsCoordinates(e));
-  drawTargets();
+  updateScreen();
+
+  // #region draw a new target
+  const pos2 = getAbsCoordinates(e);
+  // start drawing the new rect
+  ctx.beginPath();
+  ctx.fillStyle = 'rgba(10,10,10,0.5)';
+  // the new rect
+  ctx.rect(lastPos.x, lastPos.y, pos2.x - lastPos.x, pos2.y - lastPos.y);
+  ctx.fill(); // render the rect
+  // #endregion
 });
 
 canvas.addEventListener('mousedown', (e) => {
-  if (!eraseMode) pos1 = getAbsCoordinates(e);
+  // save the click position to create a target with this as one of its corners
+  if (!eraseMode) lastPos = getAbsCoordinates(e);
 });
 
 canvas.addEventListener('mouseup', (e) => {
   if (eraseMode) {
-    // TODO
     const curPos = getAbsCoordinates(e);
 
     const oldLen = targets.length;
@@ -113,51 +107,32 @@ canvas.addEventListener('mouseup', (e) => {
       const isBetweenY = curPos.y >= y1 && curPos.y <= y2;
       // #endregion
 
-      const hit = isBetweenX && isBetweenY;
-
-      if (hit) deleteObstacle(target[2]);
+      if (isBetweenX && isBetweenY) deleteTarget(target[2]); // delete the target if same position
     }
 
     console.log('Deleted ' + (oldLen - targets.length) + ' targets');
 
-    resetCanvas(); // reset the canvas first
+    updateScreen();
+  } else {
+    resetTargets = []; // reset the previous stored deleted targets
 
-    drawTargets(); // draw the old targets
+    // push new [pos1, pos2, name, color]
+    targets.push([
+      lastPos,
+      getAbsCoordinates(e),
+      elementIDCounter.toString(),
+      [10, 10, 10]
+    ]);
+    elementIDCounter++;
 
-    return; // no further code execution
+    updateScreen();
+
+    lastPos = { x: -1, y: -1 }; // reset position for next target
   }
-
-  resetCanvas(); // reset the canvas first
-
-  drawTargets(); // draw the old targets
-  // onCreate()
-  drawNewTarget(getAbsCoordinates(e)); // draw the new target
-
-  // pos1, pos2, name, color
-  targets.push([
-    pos1,
-    getAbsCoordinates(e),
-    elementIDCounter.toString(),
-    [10, 10, 10]
-  ]);
-  elementIDCounter++;
-  visualizeTargets();
-
-  pos1 = { x: -1, y: -1 }; // reset position for next target
 });
 // #endregion
 
 // #region functions
-function drawNewTarget(pos2) {
-  resetTargets = []; // reset the previous data
-  // start drawing the new rect
-  ctx.beginPath();
-  ctx.fillStyle = 'rgba(10,10,10,0.5)';
-  // the new rect
-  ctx.rect(pos1.x, pos1.y, pos2.x - pos1.x, pos2.y - pos1.y);
-  ctx.fill(); // render the rect
-}
-
 function getAbsCoordinates(event) {
   return {
     x: parseFloat(((event.clientX - rect.left) * (10 / 3)).toFixed(2)),
@@ -166,22 +141,20 @@ function getAbsCoordinates(event) {
 }
 
 function drawTargets() {
-  const ctx = canvas.getContext('2d');
-
-  ctx.beginPath();
-  ctx.fillStyle = 'rgba(10,10,10,0.5)';
   for (const target of targets) {
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(${target[3][0]},${target[3][1]},${target[3][2]},0.5)`;
     ctx.rect(
       target[0].x,
       target[0].y,
       target[1].x - target[0].x,
       target[1].y - target[0].y
     );
+    ctx.fill();
   }
-  ctx.fill();
 }
 
-function resetCanvas() {
+function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -193,19 +166,12 @@ function onInputFieldChange() {
     document.getElementById(targets[i][2]).id = newVal;
     targets[i][2] = newVal.toString();
   }
-
-  //const oldNames = elements.innerHTML.matchAll(/value="(.*?)"/g);
-  //for (const c of oldNames) console.log('Names: ', c[1]);
 }
 
-function visualizeTargets() {
-  const elements = document.getElementById('elements');
-
+function renderTargetsData() {
   let result = '';
-  let x = 0;
 
-  //Pass through all child to get the name
-
+  // create for each target a div with all the values
   for (const target of targets) {
     result +=
       `<div
@@ -226,8 +192,8 @@ function visualizeTargets() {
       target[2] +
       `" onchange="onInputFieldChange()"></input>
             <button id=id-` +
-      x +
-      `  onclick="deleteObstacle(` +
+      target[2] +
+      `  onclick="deleteTarget(` +
       target[2] +
       `)" style="margin-left: 10px; background-color: red;">delete</button>
           </div>
@@ -248,11 +214,13 @@ function visualizeTargets() {
         </div>`;
   }
 
-  elements.innerHTML = result;
+  document.getElementById('elements').innerHTML = result;
 }
 
-function deleteObstacle(name) {
+function deleteTarget(name) {
   let activeTimeout = -1;
+
+  // TODO
   for (let i = 0; i < targets.length; ++i) {
     if (targets[i][2] === name) {
       const val = targets.splice(i, 1);
@@ -270,9 +238,12 @@ function deleteObstacle(name) {
     }
   }
 
-  resetCanvas();
+  updateScreen();
+}
 
-  visualizeTargets();
-  drawTargets();
+function updateScreen() {
+  clearCanvas(); // reset the entire screen
+  drawTargets(); // draw all the targets
+  renderTargetsData(); // update the html
 }
 // #endregion
