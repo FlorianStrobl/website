@@ -34,7 +34,7 @@ document.addEventListener('keydown', (e) => {
             md() + ' - Deleted an obstacle';
           setTimeout(() => {
             document.getElementById('mode').innerHTML = md();
-          }, 2500);
+          }, 2000);
         }
         resetCanvas(); // reset canvas and draw all the targets again
         drawTargets();
@@ -49,6 +49,9 @@ document.addEventListener('keydown', (e) => {
           targets.push(val); // delete last target and save it for "y"
           document.getElementById('mode').innerHTML =
             md() + ' - Restored an obstacle';
+          setTimeout(() => {
+            document.getElementById('mode').innerHTML = md();
+          }, 2000);
         }
         resetCanvas(); // reset canvas and draw all the targets again
         drawTargets();
@@ -81,7 +84,7 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mouseup', (e) => {
   if (eraseMode) {
-    console.log('test');
+    // TODO
     const curPos = getAbsCoordinates(e);
 
     targets = targets.filter((target) => {
@@ -122,6 +125,7 @@ canvas.addEventListener('mouseup', (e) => {
   resetCanvas(); // reset the canvas first
 
   drawTargets(); // draw the old targets
+  // onCreate()
   drawNewTarget(getAbsCoordinates(e)); // draw the new target
 
   targets.push([pos1, getAbsCoordinates(e), elementIDCounter.toString()]);
@@ -134,6 +138,7 @@ canvas.addEventListener('mouseup', (e) => {
 
 // #region functions
 function drawNewTarget(pos2) {
+  resetTargets = []; // reset the previous data
   // start drawing the new rect
   ctx.beginPath();
   ctx.fillStyle = 'rgba(10,10,10,0.5)';
