@@ -13,13 +13,13 @@ let resetTargets = []; // for "z" and "y"
 let elementIDCounter = 0;
 
 let lastPos = { x: -1, y: -1 };
+
+const getModeStr = () => (eraseMode ? 'Erase mode' : 'Create mode');
 // #endregion
 
 // #region event listeners
 // key modifier: "e", "z" and "y"
 document.addEventListener('keydown', (e) => {
-  const getModeStr = () => (eraseMode ? 'Erase mode' : 'Create mode');
-
   switch (e.keyCode) {
     case 69: // "e"
       eraseMode = !eraseMode; // switch erase mode
@@ -27,7 +27,7 @@ document.addEventListener('keydown', (e) => {
       document.getElementById('mode').innerHTML = getModeStr();
       break;
     case 90: // "z"
-      deleteTarget(targets[targets.length - 1][2]); // delete the last target
+      if (targets.length > 0) deleteTarget(targets[targets.length - 1][2]); // delete the last target
       updateScreen(); // redraw everything
       break;
     case 89: // "y"
@@ -136,7 +136,7 @@ canvas.addEventListener('mouseup', (e) => {
 function getAbsCoordinates(event) {
   return {
     x: parseFloat(((event.clientX - rect.left) * (10 / 3)).toFixed(2)),
-    y: parseFloat((event.clientY - rect.top) * (10 / 3)).toFixed(2)
+    y: parseFloat(((event.clientY - rect.top) * (10 / 3)).toFixed(2))
   };
 }
 
@@ -199,16 +199,16 @@ function renderTargetsData() {
           </div>
             <hr / style="margin-bottom: -10px;">
             <p>
-              [{x:` +
+              Corner 1: { x:` +
       target[0].x.toString() +
       `, y: ` +
       target[0].y.toString() +
-      `} <br />
-              {x:` +
+      ` } <br />
+              Cornder 2: { x:` +
       target[1].x +
       `, y: ` +
       target[1].y +
-      `}]
+      ` }
             </p>
           </div>
         </div>`;
@@ -218,22 +218,31 @@ function renderTargetsData() {
 }
 
 function deleteTarget(name) {
+  name = name.toString();
+
   let activeTimeout = -1;
 
   // TODO
   for (let i = 0; i < targets.length; ++i) {
+    // for each target
     if (targets[i][2] === name) {
-      const val = targets.splice(i, 1);
+      // if it has the correct name
+
+      const val = targets.splice(i, 1)[0]; // delete the element
       if (val !== undefined) {
-        resetTargets.push(val);
-        if (activeTimeout !== -1) {
-          clearTimeout(activeTimeout);
-          document.getElementById('mode').innerHTML =
-            md() + ' - Deleted last created obstacle';
-          activeTimeout = setTimeout(() => {
-            document.getElementById('mode').innerHTML = md();
-          }, 2000);
-        }
+        resetTargets.push(val); // save the value for restore option
+
+        // dont reset the html with the previous timer
+        if (activeTimeout !== -1) clearTimeout(activeTimeout);
+
+        // update the html
+        document.getElementById('mode').innerHTML =
+          getModeStr() + ' - Deleted an obstacle';
+
+        // reset the html in 2 seconds
+        activeTimeout = setTimeout(() => {
+          document.getElementById('mode').innerHTML = getModeStr();
+        }, 2000);
       }
     }
   }
