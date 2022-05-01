@@ -2,8 +2,8 @@
 
 // #region constants
 const canvas = document.querySelector('canvas');
-const rect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext('2d');
+const rect = canvas.getBoundingClientRect();
 // #endregion
 
 // #region vars
@@ -27,14 +27,10 @@ document.addEventListener('keydown', (e) => {
       break;
     case 90: // "z"
       if (!eraseMode) {
+        deleteObstacle(targets[targets.length - 1][2]);
         const val = targets.pop();
         if (val !== undefined) {
           resetTargets.push(val); // delete last target and save it for "y"
-          document.getElementById('mode').innerHTML =
-            md() + ' - Deleted an obstacle';
-          setTimeout(() => {
-            document.getElementById('mode').innerHTML = md();
-          }, 2000);
         }
         resetCanvas(); // reset canvas and draw all the targets again
         drawTargets();
@@ -48,11 +44,12 @@ document.addEventListener('keydown', (e) => {
         if (val !== undefined) {
           targets.push(val); // delete last target and save it for "y"
           document.getElementById('mode').innerHTML =
-            md() + ' - Restored an obstacle';
+            md() + ' - Restored last deleted obstacle';
           setTimeout(() => {
             document.getElementById('mode').innerHTML = md();
           }, 2000);
         }
+
         resetCanvas(); // reset canvas and draw all the targets again
         drawTargets();
 
@@ -87,7 +84,11 @@ canvas.addEventListener('mouseup', (e) => {
     // TODO
     const curPos = getAbsCoordinates(e);
 
-    targets = targets.filter((target) => {
+    const oldLen = targets.length;
+    for (let i = 0; i < targets.length; ++i) {
+      const target = targets[i];
+
+      // #region check if it hits it
       let x1 = -1;
       let x2 = -1; // the bigger one
       if (target[0].x < target[1].x) {
@@ -108,12 +109,16 @@ canvas.addEventListener('mouseup', (e) => {
         y1 = target[1].y;
       }
 
-      console.log(x1, x2, y1, y2);
-
       const isBetweenX = curPos.x >= x1 && curPos.x <= x2;
       const isBetweenY = curPos.y >= y1 && curPos.y <= y2;
-      return !(isBetweenX && isBetweenY);
-    });
+      // #endregion
+
+      const hit = isBetweenX && isBetweenY;
+
+      if (hit) deleteObstacle(target[2]);
+    }
+
+    console.log('Deleted ' + (oldLen - targets.length) + ' targets');
 
     resetCanvas(); // reset the canvas first
 
@@ -181,20 +186,20 @@ function resetCanvas() {
 }
 
 function onInputFieldChange() {
-  console.log('input field change');
-  const elements = document.getElementById('elements');
+  for (let i = 0; i < targets.length; ++i) {
+    const newVal = document.getElementById(targets[i][2]).value;
 
-  const oldNames = elements.innerHTML.matchAll(/value="(.*?)"/g);
-  console.clear();
-  for (const c of oldNames) console.log('Names: ', c[1]);
+    // update the id and name to the new value
+    document.getElementById(targets[i][2]).id = newVal;
+    targets[i][2] = newVal.toString();
+  }
+
+  //const oldNames = elements.innerHTML.matchAll(/value="(.*?)"/g);
+  //for (const c of oldNames) console.log('Names: ', c[1]);
 }
 
 function visualizeTargets() {
   const elements = document.getElementById('elements');
-
-  // update all the names before
-  //const oldNames = elements.innerHTML.matchAll(/value="(.*?)"/g);
-  //for (const c of oldNames) console.log('Old names: ', c[1]);
 
   let result = '';
   let x = 0;
@@ -215,13 +220,15 @@ function visualizeTargets() {
             "
           >
           <div style="display: flex;">
-            <input value="` +
+            <input id="` +
+      target[2] +
+      `" type="text" value="` +
       target[2] +
       `" onchange="onInputFieldChange()"></input>
             <button id=id-` +
       x +
-      `  onclick="deleteElement(` +
-      x +
+      `  onclick="deleteObstacle(` +
+      target[2] +
       `)" style="margin-left: 10px; background-color: red;">delete</button>
           </div>
             <hr / style="margin-bottom: -10px;">
@@ -239,15 +246,32 @@ function visualizeTargets() {
             </p>
           </div>
         </div>`;
-    x += 1;
   }
 
   elements.innerHTML = result;
 }
 
-function deleteElement(id) {
-  targets = targets.filter((_, i) => i !== id);
+function deleteObstacle(name) {
+  let activeTimeout = -1;
+  for (let i = 0; i < targets.length; ++i) {
+    if (targets[i][2] === name) {
+      const val = targets.splice(i, 1);
+      if (val !== undefined) {
+        resetTargets.push(val);
+        if (activeTimeout !== -1) {
+          clearTimeout(activeTimeout);
+          document.getElementById('mode').innerHTML =
+            md() + ' - Deleted last created obstacle';
+          activeTimeout = setTimeout(() => {
+            document.getElementById('mode').innerHTML = md();
+          }, 2000);
+        }
+      }
+    }
+  }
+
   resetCanvas();
+
   visualizeTargets();
   drawTargets();
 }

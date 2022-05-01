@@ -1,8 +1,8 @@
 // @ts-nocheck evil
 
-var startCar;
-var endCar;
-var _r;
+let startCar;
+let endCar;
+let _r;
 
 function setOutput(...strs) {
   for (let i = 0; i < strs.length; ++i)
