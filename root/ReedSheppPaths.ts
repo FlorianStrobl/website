@@ -18,9 +18,9 @@ namespace ReedSheepPaths {
   const halfPi: number = Math.PI / 2;
 
   type pos = { x: number; y: number }; // a position
-  type car = { pos: pos; heading: number }; // a cars values
+  export type car = { pos: pos; heading: number }; // a cars values
 
-  type path = {
+  export type path = {
     pathType: string;
     pathTypeValue: string;
     arc1: number;
@@ -39,14 +39,14 @@ namespace ReedSheepPaths {
   // then the RSR path has the length = turningRadius * PI + (|A-B|)
 
   // start values of the car
-  export const startCar: car = {
+  export const _startCar: car = {
     pos: { x: 0, y: 0 },
     heading: degToRad(0) // 0 is right, 90 is north
   };
   // end/final values of the car
-  export const goalCar: car = {
-    pos: { x: 10, y: 0 },
-    heading: degToRad(45)
+  export const _goalCar: car = {
+    pos: { x: 653, y: 135 },
+    heading: degToRad(246)
   };
   // #endregion
 
@@ -83,8 +83,8 @@ namespace ReedSheepPaths {
   // #region CSC
   // RSR, (rsr) paths
   export function getRSR(
-    car1: car = startCar,
-    car2: car = goalCar,
+    car1: car = _startCar,
+    car2: car = _goalCar,
     r: number = turningRadius
   ): path[] {
     /**
@@ -300,8 +300,8 @@ namespace ReedSheepPaths {
   }
 
   export function getLSL(
-    car1: car = startCar,
-    car2: car = goalCar,
+    car1: car = _startCar,
+    car2: car = _goalCar,
     r: number = turningRadius
   ): path[] {
     // #region circles and distances
@@ -490,8 +490,8 @@ namespace ReedSheepPaths {
   }
 
   export function getCSCPaths(
-    car1: car = startCar,
-    car2: car = goalCar,
+    car1: car = _startCar,
+    car2: car = _goalCar,
     r: number = turningRadius
   ): path[] {
     const rsrPaths: path[] = getRSR(car1, car2, r);
@@ -504,10 +504,92 @@ namespace ReedSheepPaths {
   // #endregion
 }
 
+namespace Drive {
+  const carData = {
+    wheelCirc: 5
+  };
+
+  interface instr {
+    direction: number; // -1 to 1 (left to right)
+    len: number; // 0 to inf (mm)
+  }
+
+  // drive direction
+  enum drDirec {
+    S,
+    R,
+    L
+  }
+
+  export function getPath(
+    startCar: ReedSheepPaths.car,
+    endCar: ReedSheepPaths.car,
+    turningRadius: number
+  ): ReedSheepPaths.path {
+    const paths: ReedSheepPaths.path[] = ReedSheepPaths.getCSCPaths(
+      startCar,
+      endCar,
+      turningRadius
+    );
+    // TODO check if path doesnt collide with car and obstacles
+    return paths[0];
+  }
+
+  export function pathToInstructions(
+    startCar: ReedSheepPaths.car,
+    endCar: ReedSheepPaths.car,
+    turningRadius: number
+  ) {
+    const path: ReedSheepPaths.path = getPath(startCar, endCar, turningRadius);
+    console.log(path);
+
+    if (path.pathType === 'CSC') {
+      let instruction: instr[] = [];
+      let type: string = path.pathTypeValue;
+      // for (const char of type) {
+      // } TODO
+      // part 1: C
+      if (type.startsWith('r') || type.startsWith('R')) {
+        instruction.push({
+          direction: drDirec.R,
+          len: type.startsWith('r') ? -path.arc1 : path.arc1
+        });
+      } else if (type.startsWith('l') || type.startsWith('L')) {
+        instruction.push({
+          direction: drDirec.L,
+          len: type.startsWith('l') ? -path.arc1 : path.arc1
+        });
+      }
+
+      // part 2: S
+      if (type[1] === 'S')
+        instruction.push({ direction: drDirec.S, len: path.straight });
+      else if (type[1] === 's') {
+        instruction.push({ direction: drDirec.S, len: -path.straight });
+      }
+
+      // part 3: C
+      if (type.endsWith('r') || type.endsWith('R')) {
+        instruction.push({
+          direction: drDirec.R,
+          len: type.endsWith('r') ? -path.arc1 : path.arc1
+        });
+      } else if (type.endsWith('l') || type.endsWith('L')) {
+        instruction.push({
+          direction: drDirec.L,
+          len: type.endsWith('l') ? -path.arc1 : path.arc1
+        });
+      }
+
+      return instruction;
+    } else return 'error' as any;
+  }
+}
+
 console.log(
-  ReedSheepPaths.getCSCPaths(
-    ReedSheepPaths.startCar,
-    ReedSheepPaths.goalCar,
+  Drive.pathToInstructions(
+    ReedSheepPaths._startCar,
+    ReedSheepPaths._goalCar,
     10
   )
 );
