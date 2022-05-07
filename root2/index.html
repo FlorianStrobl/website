@@ -2,7 +2,21 @@
 <html>
   <body>
     <div id="xy" style="margin-bottom: 20px">X : - , Y : -</div>
-    <p id="mode">Create mode</p>
+    <div style="display: flex">
+      <p id="mode">Create mode</p>
+      <p style="margin-left: 10px; margin-right: 10px">|</p>
+      <input id="rotationInput"  value="90"  placeholder="rotation" style=" margin-left: 5px; height: 15px;width: 50px; margin-top: 15px"></input>
+      <button onclick="setCarMode()" style="height: 20px; margin-top: 15px">
+        Set Car
+      </button>
+
+      <button style="margin-left: 5px; height: 20px; margin-top: 15px">
+        Set Goal
+      </button>
+
+      <p onclick="setGoalMode()" style="margin-left: 10px; margin-right: 10px">|</p>
+    </div>
+
     <div style="display: flex">
       <canvas
         id="canvas"
