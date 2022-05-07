@@ -496,6 +496,7 @@ namespace ReedSheepPaths {
   ): path[] {
     const rsrPaths: path[] = getRSR(car1, car2, r);
     const lslPaths: path[] = getLSL(car1, car2, r);
+    // sort the paths after their length
     const paths: path[] = [...rsrPaths, ...lslPaths].sort(
       (a, b) => a.arc1 + a.arc2 - (b.arc1 + b.arc2)
     );
@@ -509,6 +510,7 @@ namespace Drive {
     wheelCirc: 5
   };
 
+  // instructions for the car
   interface instr {
     direction: number; // -1 to 1 (left to right)
     len: number; // 0 to inf (mm)
@@ -526,66 +528,65 @@ namespace Drive {
     endCar: ReedSheepPaths.car,
     turningRadius: number
   ): ReedSheepPaths.path {
+    // all CSC paths
     const paths: ReedSheepPaths.path[] = ReedSheepPaths.getCSCPaths(
       startCar,
       endCar,
       turningRadius
     );
-    // TODO check if path doesnt collide with car and obstacles
-    return paths[0];
+
+    // check if path doesnt collide with car and obstacles
+    for (const path of paths) {
+      if (Sim.drivePath(startCar, pathToInstr(path), []) === true) {
+        // path can be driven even with the obstacles!
+        console.log('path:', path);
+        return path;
+      }
+    }
+
+    throw Error("Coulnd't find a valid path");
   }
 
-  export function pathToInstructions(
-    startCar: ReedSheepPaths.car,
-    endCar: ReedSheepPaths.car,
-    turningRadius: number
-  ): instr[] {
-    const path: ReedSheepPaths.path = getPath(startCar, endCar, turningRadius);
-    console.log(path);
-
+  export function pathToInstr(path: ReedSheepPaths.path): instr[] {
     if (path.pathType === 'CSC') {
       let instruction: instr[] = [];
       let type: string = path.pathTypeValue;
-      // for (const char of type) {
-      // } TODO
+
       // part 1: C
-      if (type.startsWith('r') || type.startsWith('R')) {
+      if (type.toLowerCase().startsWith('r'))
         instruction.push({
           direction: drDirec.R,
           len: type.startsWith('r') ? -path.arc1 : path.arc1
         });
-      } else if (type.startsWith('l') || type.startsWith('L')) {
+      else
         instruction.push({
           direction: drDirec.L,
           len: type.startsWith('l') ? -path.arc1 : path.arc1
         });
-      }
 
       // part 2: S
       if (type[1] === 'S')
         instruction.push({ direction: drDirec.S, len: path.straight });
-      else if (type[1] === 's') {
+      else if (type[1] === 's')
         instruction.push({ direction: drDirec.S, len: -path.straight });
-      }
 
       // part 3: C
-      if (type.endsWith('r') || type.endsWith('R')) {
+      if (type.toLowerCase().endsWith('r'))
         instruction.push({
           direction: drDirec.R,
           len: type.endsWith('r') ? -path.arc1 : path.arc1
         });
-      } else if (type.endsWith('l') || type.endsWith('L')) {
+      else
         instruction.push({
           direction: drDirec.L,
           len: type.endsWith('l') ? -path.arc1 : path.arc1
         });
-      }
 
       return instruction;
     } else return 'error' as any;
   }
 
-  export function driveInstructions(instrs: instr[]): void {
+  export function drive(instrs: instr[]): void {
     // TODO
     // init motors
 
@@ -611,32 +612,40 @@ namespace Drive {
 
   export namespace Sim {
     export function drivePath(
-      startPos: ReedSheepPaths.car,
+      startCar: ReedSheepPaths.car,
       path: instr[],
       obstacles: []
-    ) {
+    ): boolean {
       /*
         X(t+dt) = X(t) + (v cos) dt
         Y(t+dt) = Y(t) + (v sin) dt
         theta(t+dt) = theta(t) + dt (v/r)
       */
 
-      let curPosX = startPos.pos.x;
-      let curPosY = startPos.pos.y;
-      let curHeading = startPos.heading;
-      const speed = 100; // test
-      const v = (speed * path[0].len) / 0.01;
-      for (let i = 0; i < path[0].len; i += 0.01) {
-        curPosX = curPosX + Math.cos(curHeading) * v * 0.01;
+      let newCarValues: ReedSheepPaths.car = updatePos(startCar, 0.001, 0);
+
+      console.log(newCarValues);
+
+      return true;
+
+      function updatePos(
+        car: ReedSheepPaths.car,
+        deltaT: number,
+        steering: number
+      ): ReedSheepPaths.car {
+        const v: number = 1; // 1mm per s
+        car.pos.x = car.pos.x + deltaT * Math.cos(car.heading) * v;
+        car.pos.y = car.pos.y + deltaT * Math.sin(car.heading) * v;
+        return car;
       }
     }
   }
 }
 
 console.log(
-  Drive.pathToInstructions(
-    ReedSheepPaths._startCar,
-    ReedSheepPaths._goalCar,
-    10
+  Drive.drive(
+    Drive.pathToInstr(
+      Drive.getPath(ReedSheepPaths._startCar, ReedSheepPaths._goalCar, 10)
+    )
   )
 );
