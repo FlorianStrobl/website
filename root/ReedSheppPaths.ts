@@ -651,6 +651,12 @@ namespace Drive {
 
           return car;
         }
+
+        function checkIfHit(car: ReedSheepPaths.car, obstacles: []): boolean {
+          for (const obs of obstacles) {
+          }
+          return true;
+        }
       }
 
       return true;
