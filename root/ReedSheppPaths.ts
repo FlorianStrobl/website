@@ -645,10 +645,13 @@ namespace Drive {
         const speed: number = 1; // 1mm per s
         const timeNeeded: number = instr.len / speed;
 
+        // if newCarValues is at the end, stop
         for (let i = 0; i < timeNeeded; i += deltaT) {
           newCarValues = updateCar(newCarValues, instr.direction);
           // if newCarValue hit an obstacle stop
-          // if newCarValues is at the end, stop
+          if (checkIfHit(newCarValues, obstacles)) {
+            return false; // we hit an obstacle
+          }
         }
 
         _car = newCarValues; // save the new position and heading values into the car
@@ -657,10 +660,10 @@ namespace Drive {
         function updateCar(car: car, steering: number): car {
           // set new position and heading
           car.heading += deltaT * (speed / carData.turningRadius);
-          car.heading %= Math.PI * 2;
+          car.heading %= Math.PI * 2; // wrap around
 
-          car.pos.x += deltaT * Math.cos(car.heading) * speed;
-          car.pos.y += deltaT * Math.sin(car.heading) * speed;
+          car.pos.x += deltaT * speed * Math.cos(car.heading);
+          car.pos.y += deltaT * speed * Math.sin(car.heading);
 
           return car;
         }
