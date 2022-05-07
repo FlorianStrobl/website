@@ -629,7 +629,7 @@ namespace Drive {
         let newCarValues: ReedSheepPaths.car = startCar;
         const deltaT: number = 0.001; // in s
         const speed: number = 1; // 1mm per s
-        const timeNeeded: number = -1;
+        const timeNeeded: number = instr.len / speed;
 
         for (let i = 0; i < timeNeeded; i += deltaT) {
           newCarValues = updateCar(newCarValues, instr.direction);
@@ -643,10 +643,11 @@ namespace Drive {
           car: ReedSheepPaths.car,
           steering: number
         ): ReedSheepPaths.car {
-          // set new position
-          car.pos.x = car.pos.x + deltaT * Math.cos(car.heading) * speed;
-          car.pos.y = car.pos.y + deltaT * Math.sin(car.heading) * speed;
-          car.heading = car.heading + deltaT * (speed / carData.turningRadius);
+          // set new position and heading
+          car.heading += deltaT * (speed / carData.turningRadius);
+
+          car.pos.x += deltaT * Math.cos(car.heading) * speed;
+          car.pos.y += deltaT * Math.sin(car.heading) * speed;
 
           return car;
         }
