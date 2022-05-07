@@ -507,7 +507,8 @@ namespace ReedSheepPaths {
 
 namespace Drive {
   const carData = {
-    wheelCirc: 5
+    wheelCirc: 5,
+    turningRadius: 1
   };
 
   // instructions for the car
@@ -527,7 +528,7 @@ namespace Drive {
     startCar: ReedSheepPaths.car,
     endCar: ReedSheepPaths.car,
     turningRadius: number
-  ): ReedSheepPaths.path {
+  ): instr[] {
     // all CSC paths
     const paths: ReedSheepPaths.path[] = ReedSheepPaths.getCSCPaths(
       startCar,
@@ -537,17 +538,18 @@ namespace Drive {
 
     // check if path doesnt collide with car and obstacles
     for (const path of paths) {
-      if (Sim.drivePath(startCar, pathToInstr(path), []) === true) {
+      const instr: instr[] = pathToInstr(path);
+      if (Sim.drivePath(startCar, instr, []) === true) {
         // path can be driven even with the obstacles!
-        console.log('path:', path);
-        return path;
+        console.log('path, instr:', path, instr);
+        return instr;
       }
     }
 
     throw Error("Coulnd't find a valid path");
   }
 
-  export function pathToInstr(path: ReedSheepPaths.path): instr[] {
+  function pathToInstr(path: ReedSheepPaths.path): instr[] {
     if (path.pathType === 'CSC') {
       let instruction: instr[] = [];
       let type: string = path.pathTypeValue;
@@ -556,19 +558,19 @@ namespace Drive {
       if (type.toLowerCase().startsWith('r'))
         instruction.push({
           direction: drDirec.R,
-          len: type.startsWith('r') ? -path.arc1 : path.arc1
+          len: type.startsWith('r') ? -path.arc1 : path.arc1 // forward/reversing
         });
       else
         instruction.push({
           direction: drDirec.L,
-          len: type.startsWith('l') ? -path.arc1 : path.arc1
+          len: type.startsWith('l') ? -path.arc1 : path.arc1 // forward/reversing
         });
 
       // part 2: S
-      if (type[1] === 'S')
-        instruction.push({ direction: drDirec.S, len: path.straight });
-      else if (type[1] === 's')
-        instruction.push({ direction: drDirec.S, len: -path.straight });
+      instruction.push({
+        direction: drDirec.S,
+        len: type[1] === 'S' ? path.straight : -path.straight // forward/reversing
+      });
 
       // part 3: C
       if (type.toLowerCase().endsWith('r'))
@@ -610,10 +612,11 @@ namespace Drive {
     }
   }
 
-  export namespace Sim {
+  namespace Sim {
+    // returns true if the path is drivable
     export function drivePath(
       startCar: ReedSheepPaths.car,
-      path: instr[],
+      instrs: instr[],
       obstacles: []
     ): boolean {
       /*
@@ -622,30 +625,40 @@ namespace Drive {
         theta(t+dt) = theta(t) + dt (v/r)
       */
 
-      let newCarValues: ReedSheepPaths.car = updatePos(startCar, 0.001, 0);
+      for (const instr of instrs) {
+        let newCarValues: ReedSheepPaths.car = startCar;
+        const deltaT: number = 0.001; // in s
+        const speed: number = 1; // 1mm per s
+        const timeNeeded: number = -1;
 
-      console.log(newCarValues);
+        for (let i = 0; i < timeNeeded; i += deltaT) {
+          newCarValues = updateCar(newCarValues, instr.direction);
+          // if newCarValue hit an obstacle stop
+          // if newCarValues is at the end, stop
+        }
+
+        console.log(newCarValues);
+
+        function updateCar(
+          car: ReedSheepPaths.car,
+          steering: number
+        ): ReedSheepPaths.car {
+          // set new position
+          car.pos.x = car.pos.x + deltaT * Math.cos(car.heading) * speed;
+          car.pos.y = car.pos.y + deltaT * Math.sin(car.heading) * speed;
+          car.heading = car.heading + deltaT * (speed / carData.turningRadius);
+
+          return car;
+        }
+      }
 
       return true;
-
-      function updatePos(
-        car: ReedSheepPaths.car,
-        deltaT: number,
-        steering: number
-      ): ReedSheepPaths.car {
-        const v: number = 1; // 1mm per s
-        car.pos.x = car.pos.x + deltaT * Math.cos(car.heading) * v;
-        car.pos.y = car.pos.y + deltaT * Math.sin(car.heading) * v;
-        return car;
-      }
     }
   }
 }
 
 console.log(
   Drive.drive(
-    Drive.pathToInstr(
-      Drive.getPath(ReedSheepPaths._startCar, ReedSheepPaths._goalCar, 10)
-    )
+    Drive.getPath(ReedSheepPaths._startCar, ReedSheepPaths._goalCar, 10)
   )
 );
