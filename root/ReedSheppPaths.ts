@@ -614,7 +614,22 @@ namespace Drive {
       startPos: ReedSheepPaths.car,
       path: instr[],
       obstacles: []
-    ) {}
+    ) {
+      /*
+        X(t+dt) = X(t) + (v cos) dt
+        Y(t+dt) = Y(t) + (v sin) dt
+        theta(t+dt) = theta(t) + dt (v/r)
+      */
+
+      let curPosX = startPos.pos.x;
+      let curPosY = startPos.pos.y;
+      let curHeading = startPos.heading;
+      const speed = 100; // test
+      const v = (speed * path[0].len) / 0.01;
+      for (let i = 0; i < path[0].len; i += 0.01) {
+        curPosX = curPosX + Math.cos(curHeading) * v * 0.01;
+      }
+    }
   }
 }
 
