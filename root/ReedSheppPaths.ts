@@ -646,7 +646,7 @@ namespace Drive {
 
         // if newCarValues is at the end, stop
         for (let i = 0; i < timeNeeded; i += deltaT) {
-          _car = updateCar(_car, instr.direction);
+          _car = updateCar(_car, instrDirToAngle(instr.direction));
           // if newCarValue hit an obstacle stop
           if (checkIfHit(_car, obstacles)) {
             return false; // we hit an obstacle
@@ -657,7 +657,8 @@ namespace Drive {
 
         function updateCar(car: car, steering: number): car {
           // set new position and heading
-          car.heading += deltaT * (speed / carData.turningRadius);
+          car.heading +=
+            deltaT * (speed / carData.turningRadius) * Math.tan(steering);
           car.heading %= Math.PI * 2; // wrap around
 
           car.pos.x += deltaT * speed * Math.cos(car.heading);
@@ -741,6 +742,11 @@ namespace Drive {
             // TODO
             return false;
           }
+        }
+
+        function instrDirToAngle(n: number ): number {
+          // TODO
+          return -1;
         }
       }
 
