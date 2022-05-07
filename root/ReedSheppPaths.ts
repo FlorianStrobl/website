@@ -516,9 +516,9 @@ namespace Drive {
 
   // drive direction
   enum drDirec {
-    S,
-    R,
-    L
+    L = -1,
+    S = 0,
+    R = 1
   }
 
   export function getPath(
@@ -539,7 +539,7 @@ namespace Drive {
     startCar: ReedSheepPaths.car,
     endCar: ReedSheepPaths.car,
     turningRadius: number
-  ) {
+  ): instr[] {
     const path: ReedSheepPaths.path = getPath(startCar, endCar, turningRadius);
     console.log(path);
 
@@ -583,6 +583,38 @@ namespace Drive {
 
       return instruction;
     } else return 'error' as any;
+  }
+
+  export function driveInstructions(instrs: instr[]): void {
+    // TODO
+    // init motors
+
+    let oldSteerVal: number = instrs[0].direction;
+    for (let i = 0; i < instrs.length; ++i) {
+      const instr: instr = instrs[i];
+      // #region set the front wheels
+      // steering from -1 (left) to 1 (right) is +2 steps...
+      // first step is different tho
+      const steer: number =
+        i === 0
+          ? instr.direction
+          : (oldSteerVal <= instr.direction ? 1 : -1) *
+            Math.abs(oldSteerVal - instr.direction);
+      oldSteerVal = instr.direction;
+
+      // rotate front wheels whith this val
+      // #endregion
+
+      // drive with back wheels
+    }
+  }
+
+  export namespace Sim {
+    export function drivePath(
+      startPos: ReedSheepPaths.car,
+      path: instr[],
+      obstacles: []
+    ) {}
   }
 }
 
