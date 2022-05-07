@@ -13,6 +13,8 @@ let carMode = false; //mode to spawn a car
 let eraseMode = false; // delete targets instead of creating them
 
 let carPosition = { x: -1000, y: -1000, degree: 90 };
+let goalPosition = { x: -1000, y: -1000 };
+
 let targets = []; // [pos1, pos2, name, color][]
 let resetTargets = []; // for "z" and "y"
 let elementIDCounter = 0;
@@ -52,7 +54,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 canvas.addEventListener('mousemove', (e) => {
-  if (carMode) return;
+  if (carMode || goalMode) return;
   // set titel to current coords
   document.getElementById('xy').innerHTML =
     getAbsCoordinates(e).x.toFixed(1) +
@@ -76,7 +78,7 @@ canvas.addEventListener('mousemove', (e) => {
 });
 
 canvas.addEventListener('mousedown', (e) => {
-  if (carMode) return;
+  if (carMode || goalMode) return;
   // save the click position to create a target with this as one of its corners
   if (!eraseMode) lastPos = getAbsCoordinates(e);
 });
@@ -85,6 +87,11 @@ canvas.addEventListener('mouseup', (e) => {
   if (carMode) {
     let cord = getAbsCoordinates(e);
     spawnCar(cord.x, cord.y);
+    return;
+  }
+  if (goalMode) {
+    let cord = getAbsCoordinates(e);
+    spawnGoal(cord.x, cord.y);
     return;
   }
   if (eraseMode) {
@@ -266,44 +273,38 @@ function updateScreen() {
   clearCanvas(); // reset the entire screen
   drawTargets(); // draw all the targets
   renderTargetsData(); // update the html
-  drawCar2(carPosition.x, carPosition.y, carPosition.degree);
+  drawCar(carPosition.x, carPosition.y, carPosition.degree);
+  drawGoal(goalPosition.x, goalPosition.y);
 }
 
-function drawCarOLD(x, y, rotation) {
-  ctx.beginPath();
-  const width = 1000;
-  const height = 1000;
+function getObstacles() {
+  function getTargetsAsArray() {
+    r = [];
+    for (target of targets) {
+      r.push([
+        [target[0].x, target[0].y],
+        [target[1].x, target[1].y]
+      ]);
+    }
+    return r;
+  }
+  res = JSON.stringify(getTargetsAsArray());
 
-  ctx.fillStyle = `rgba(${target[3][0]},${target[3][1]},${target[3][2]},0.5)`;
-
-  rotation *= Math.PI / 180;
-  ctx.rotate(rotation);
-
-  const _x =
-    Math.floor(
-      width * Math.cos(rotation) * 0.5 - height * Math.sin(rotation) * 0.5
-    ) + x;
-  const _y =
-    Math.floor(
-      width * Math.sin(rotation) * 0.5 + height * Math.cos(rotation) * 0.5
-    ) + y;
-
-  ctx.rect(_x, _y, width, height);
-  ctx.stroke();
-  ctx.rotate(-rotation);
-
-  ctx.fill();
+  console.log(res);
+  navigator.clipboard.writeText(res);
+  return res;
 }
 
-function drawCar2(x, y, rotation) {
-  var ctx = canvas.getContext('2d');
+//#region [functions] cars and goals
+function drawCar(x, y, rotation) {
   ctx.fillStyle = 'green';
   ctx.globalAlpha = 0.8;
 
   ctx.beginPath();
 
-  var rect = { x: x, y: y, width: 175, height: 50 };
-
+  const w = 175;
+  const h = 50;
+  let rect = { x: x - w / 2, y: y - h / 2, width: 175, height: 50 };
   rotation *= Math.PI / 180;
 
   ctx.translate(rect.x + rect.width / 2, rect.y + rect.height / 2);
@@ -315,20 +316,48 @@ function drawCar2(x, y, rotation) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
-function deleteCar() {
-  let carPosition = { x: -1000, y: -1000, degree: 90 };
+function drawGoal(x, y) {
+  ctx.fillStyle = 'red';
+  ctx.globalAlpha = 0.8;
+
+  const radius = 50;
+
+  let circle = new Path2D();
+  circle.arc(x, y, radius, 0, 2 * Math.PI, false);
+  ctx.fill(circle);
+  document.getElementById('mode').innerHTML = getModeStr();
+}
+
+function spawnGoal(x, y) {
+  goalPosition = { x: x, y: y };
+  drawGoal(x, y);
+  goalMode = false;
+  updateScreen();
+  document.getElementById('mode').innerHTML = getModeStr();
 }
 
 function spawnCar(x, y) {
   const rotation = parseInt(document.getElementById('rotationInput').value);
   carPosition = { x: x, y: y, degree: rotation };
-  drawCar2(x, y, rotation);
+  drawCar(x, y, rotation);
   carMode = false;
   updateScreen();
 }
 
-let setCarMode = () => (carMode = true);
+let enableCarMode = () => {
+  carMode = true;
+  document.getElementById('mode').innerHTML = 'set car';
+};
 
-let setGoalMode = () => (goalMode = true);
+let enableGoalMode = () => {
+  goalMode = true;
+  document.getElementById('mode').innerHTML = 'set goal';
+};
+
+//#endregion
 
 // #endregion
+
+function pxToCm(px){
+  
+}
