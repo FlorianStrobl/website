@@ -624,11 +624,11 @@ namespace Drive {
   namespace Sim {
     // returns true if the path is drivable
     export function drivePath(
-      startCar: car,
+      _car: car,
       instrs: instr[],
       obstacles: []
     ): boolean {
-      console.log('Check if this path is valid: ', startCar, instrs, obstacles);
+      console.log('Check if this path is valid: ', _car, instrs, obstacles);
 
       /*
         Vehicle Dynamics:
@@ -638,7 +638,9 @@ namespace Drive {
       */
 
       for (const instr of instrs) {
-        let newCarValues: car = startCar;
+        console.log('simulate driving this instruction: ', instr);
+
+        let newCarValues: car = _car;
         const deltaT: number = 0.001; // in s
         const speed: number = 1; // 1mm per s
         const timeNeeded: number = instr.len / speed;
@@ -649,11 +651,13 @@ namespace Drive {
           // if newCarValues is at the end, stop
         }
 
-        //console.log(newCarValues);
+        _car = newCarValues; // save the new position and heading values into the car
+        console.log('new car values after this instruction executed: ', _car);
 
         function updateCar(car: car, steering: number): car {
           // set new position and heading
           car.heading += deltaT * (speed / carData.turningRadius);
+          car.heading %= Math.PI * 2;
 
           car.pos.x += deltaT * Math.cos(car.heading) * speed;
           car.pos.y += deltaT * Math.sin(car.heading) * speed;
