@@ -640,21 +640,19 @@ namespace Drive {
       for (const instr of instrs) {
         console.log('simulate driving this instruction: ', instr);
 
-        let newCarValues: car = _car;
         const deltaT: number = 0.001; // in s
         const speed: number = 1; // 1mm per s
         const timeNeeded: number = instr.len / speed;
 
         // if newCarValues is at the end, stop
         for (let i = 0; i < timeNeeded; i += deltaT) {
-          newCarValues = updateCar(newCarValues, instr.direction);
+          _car = updateCar(_car, instr.direction);
           // if newCarValue hit an obstacle stop
-          if (checkIfHit(newCarValues, obstacles)) {
+          if (checkIfHit(_car, obstacles)) {
             return false; // we hit an obstacle
           }
         }
 
-        _car = newCarValues; // save the new position and heading values into the car
         console.log('new car values after this instruction executed: ', _car);
 
         function updateCar(car: car, steering: number): car {
