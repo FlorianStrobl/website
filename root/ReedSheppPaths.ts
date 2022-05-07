@@ -508,7 +508,10 @@ namespace ReedSheepPaths {
 namespace Drive {
   const carData = {
     wheelCirc: 5,
-    turningRadius: 1
+    turningRadius: 1,
+    pointToUp: 1, // the middle point between the backwheels, also kown as car.pos
+    pointToDown: 0.5,
+    pointToSide: 0.5
   };
 
   // instructions for the car
@@ -652,10 +655,81 @@ namespace Drive {
           return car;
         }
 
-        function checkIfHit(car: ReedSheepPaths.car, obstacles: []): boolean {
+        function checkIfHit(
+          car: ReedSheepPaths.car,
+          obstacles: [[number, number], [number, number]][]
+        ): boolean {
           for (const obs of obstacles) {
+            // right, left, up, down
+            // TODO
+            const carCorners: { [key: string]: [number, number] } = {
+              lu: [
+                car.pos.x +
+                  Math.cos(car.heading) * carData.pointToSide -
+                  Math.sin(car.heading) * carData.pointToUp,
+                car.pos.y +
+                  Math.sin(car.heading) * carData.pointToSide +
+                  Math.cos(car.heading) * carData.pointToDown
+              ],
+              ld: [-1, -1],
+              ru: [-1, -1],
+              rd: [-1, -1]
+            };
+
+            // check if one of the cars corners in inside the obstacle
+            if (
+              checkPointHitRect(carCorners.lu, obs) ||
+              checkPointHitRect(carCorners.ru, obs) ||
+              checkPointHitRect(carCorners.ld, obs) ||
+              checkPointHitRect(carCorners.rd, obs)
+            ) {
+              return false; // car corner was inside the obstacle
+            }
+
+            // check if corner to another corner (line) hit an obstacle
+            if (
+              checkLineHitRect(carCorners.lu, carCorners.ru, obs) ||
+              checkLineHitRect(carCorners.rd, carCorners.ld, obs) ||
+              checkLineHitRect(carCorners.lu, carCorners.ld, obs) ||
+              checkLineHitRect(carCorners.ru, carCorners.rd, obs)
+            ) {
+              return false; // car hit this obstacle
+            }
           }
+
+          // no obstacle returned false
           return true;
+
+          function checkPointHitRect(
+            point: [number, number], // [x, y]
+            obs: [[number, number], [number, number]] //[[x1, y1], [x2, y2]]
+          ): boolean {
+            let smallerObsX: number =
+              obs[0][0] < obs[1][0] ? obs[0][0] : obs[1][0];
+            let biggerObsX: number =
+              obs[0][0] === smallerObsX ? obs[1][0] : obs[0][0];
+
+            let smallerObsY: number =
+              obs[0][1] < obs[1][1] ? obs[0][1] : obs[1][1];
+            let biggerObsY: number =
+              obs[0][1] === smallerObsX ? obs[1][1] : obs[0][1];
+
+            const isBetweenX: boolean =
+              point[0] >= smallerObsX && point[0] <= biggerObsX;
+            const isBetweenY: boolean =
+              point[1] >= smallerObsY && point[1] <= biggerObsY;
+
+            return isBetweenX && isBetweenY;
+          }
+
+          function checkLineHitRect(
+            a: [number, number],
+            b: [number, number],
+            obs: [[number, number], [number, number]]
+          ): boolean {
+            // TODO
+            return false;
+          }
         }
       }
 
