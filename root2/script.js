@@ -490,3 +490,15 @@ const enableGoalMode = () => {
 };
 //#endregion
 // #endregion
+
+//#region utils functions
+function mmToPx(mm) {
+  const w = 5040;
+  const h = 2438;
+
+  const fieldSize = [2362, 1143];
+
+  let oneMM = w / fieldSize[0];
+
+  return oneMM * mm;
+}

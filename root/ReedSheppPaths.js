@@ -463,6 +463,7 @@ var Drive;
     }
     Drive.getPath = getPath;
     function pathToInstr(path) {
+        console.log(path.pathType);
         if (path.pathType === 'CSC') {
             let instruction = [];
             let type = path.pathTypeValue;
@@ -498,6 +499,7 @@ var Drive;
         else
             return 'error';
     }
+    Drive.pathToInstr = pathToInstr;
     function drive(instrs) {
         // TODO
         // init motors
@@ -616,4 +618,10 @@ var Drive;
         Sim.drivePath = drivePath;
     })(Sim || (Sim = {}));
 })(Drive || (Drive = {}));
-console.log(Drive.getPath({ pos: { x: 1000, y: 1000 }, heading: 0 }, { pos: { x: 1200, y: 1200 }, heading: 0 }, 57.2957795131));
+// console.log(
+//   Drive.getPath(
+//     { pos: { x: 1000, y: 1000 }, heading: 0 },
+//     { pos: { x: 1200, y: 1200 }, heading: 0 },
+//     57.2957795131
+//   )
+// );

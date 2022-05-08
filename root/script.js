@@ -9,6 +9,17 @@ function setOutput(...strs) {
     document.getElementById('output' + i.toString()).innerHTML = strs[i];
 }
 
+function pxToMm(px) {
+  const w = 5040;
+  const h = 2438;
+
+  const fieldSize = [236.2, 114.3];
+
+  let onePixel = fieldSize[0] / w;
+
+  return onePixel * px * 10;
+}
+
 function run() {
   // #region html input values
   const startValues = document
@@ -41,19 +52,25 @@ function run() {
   endCar = _endCar;
   // #endregion
 
+  console.log(
+    'path',
+    turningRadius,
+    ...Drive.getPath(_startCar, _endCar, turningRadius)
+  );
+
   const vals = ReedSheepPaths.getRSR(_startCar, _endCar, turningRadius, true);
   const vals2 = ReedSheepPaths.getLSL(_startCar, _endCar, turningRadius, true);
 
   clearScreen();
   updateScreen(vals.A, vals.B, vals.C, vals.D, vals.CMirror, vals.DMirror);
-  updateScreen(
-    vals2.A,
-    vals2.B,
-    vals2.C,
-    vals2.D,
-    vals2.CMirror,
-    vals2.DMirror
-  );
+  // updateScreen(
+  //   vals2.A,
+  //   vals2.B,
+  //   vals2.C,
+  //   vals2.D,
+  //   vals2.CMirror,
+  //   vals2.DMirror
+  // );
 
   const outputStr1 =
     'Right circle from start car middle point: { x: ' +

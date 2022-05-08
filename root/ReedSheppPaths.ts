@@ -756,10 +756,10 @@ namespace Drive {
   }
 }
 
-console.log(
-  Drive.getPath(
-    { pos: { x: 1000, y: 1000 }, heading: 0 },
-    { pos: { x: 1200, y: 1200 }, heading: 0 },
-    57.2957795131
-  )
-);
+// console.log(
+//   Drive.getPath(
+//     { pos: { x: 1000, y: 1000 }, heading: 0 },
+//     { pos: { x: 1200, y: 1200 }, heading: 0 },
+//     57.2957795131
+//   )
+// );
