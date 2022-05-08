@@ -355,7 +355,7 @@ function convert() {
 }
 
 function pxToMm(px) {
-  const w = 5004;
+  const w = 5040;
   const h = 2438;
 
   const fieldSize = [236.2, 114.3];
