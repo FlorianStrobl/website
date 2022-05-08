@@ -8,12 +8,12 @@ const rect = canvas.getBoundingClientRect();
 
 // #region vars
 
-let goalMode = false;
-let carMode = false; //mode to spawn a car
+let createGoalCarMode = false;
+let createStartCarMode = false; //mode to spawn a car
 let eraseMode = false; // delete targets instead of creating them
 
-let carPosition = { x: -1000, y: -1000, degree: 90 };
-let goalPosition = { x: -1000, y: -1000, degree: 90 };
+let starCarPosition = { x: -1, y: -1, degree: 0 };
+let goalCarPosition = { x: -1, y: -1, degree: 0 };
 
 let targets = []; // [pos1, pos2, name, color][]
 let resetTargets = []; // for "z" and "y"
@@ -54,7 +54,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 canvas.addEventListener('mousemove', (e) => {
-  if (carMode || goalMode) return;
+  if (createStartCarMode || createGoalCarMode) return;
   // set titel to current coords
   document.getElementById('xy').innerHTML =
     getAbsCoordinates(e).x.toFixed(1) +
@@ -78,23 +78,21 @@ canvas.addEventListener('mousemove', (e) => {
 });
 
 canvas.addEventListener('mousedown', (e) => {
-  if (carMode || goalMode) return;
+  if (createStartCarMode || createGoalCarMode) return;
   // save the click position to create a target with this as one of its corners
   if (!eraseMode) lastPos = getAbsCoordinates(e);
 });
 
 canvas.addEventListener('mouseup', (e) => {
-  if (carMode) {
-    let cord = getAbsCoordinates(e);
+  if (createStartCarMode) {
+    const cord = getAbsCoordinates(e);
     spawnCar(cord.x, cord.y);
     return;
-  }
-  if (goalMode) {
-    let cord = getAbsCoordinates(e);
+  } else if (createGoalCarMode) {
+    const cord = getAbsCoordinates(e);
     spawnGoal(cord.x, cord.y);
     return;
-  }
-  if (eraseMode) {
+  } else if (eraseMode) {
     const curPos = getAbsCoordinates(e);
 
     const oldLen = targets.length;
@@ -133,6 +131,9 @@ canvas.addEventListener('mouseup', (e) => {
 
     updateScreen();
   } else {
+    if (lastPos.x === -1) return;
+
+    // normal mode
     resetTargets = []; // reset the previous stored deleted targets
 
     // push new [pos1, pos2, name, color]
@@ -187,8 +188,38 @@ function onInputFieldChange() {
   }
 }
 
-function renderTargetsData() {
+function dataToHTML() {
   let result = '';
+
+  // #region car data
+  result +=
+    `<div style="
+              border-style: solid;
+              height: 80px;
+              margin-left: 20px;
+              margin-right: 20px;
+              border-color: rgb(0, 0, 0);
+              margin-bottom: 10px;
+            "
+          >
+            <p>
+              Start car: { x: ` +
+    starCarPosition.x +
+    `, y: ` +
+    starCarPosition.y +
+    ', heading: ' +
+    starCarPosition.degree +
+    ` } <br />
+              End car { x: ` +
+    goalCarPosition.x +
+    `, y: ` +
+    goalCarPosition.y +
+    ', heading: ' +
+    goalCarPosition.degree +
+    ` }   </p>
+          </div>
+        </div>`;
+  // #endregion
 
   // create for each target a div with all the values
   for (const target of targets) {
@@ -277,10 +308,24 @@ function deleteTarget(name) {
 
 function updateScreen() {
   clearCanvas(); // reset the entire screen
+
   drawTargets(); // draw all the targets
-  renderTargetsData(); // update the html
-  drawCar(carPosition.x, carPosition.y, carPosition.degree, 'green');
-  drawCar(goalPosition.x, goalPosition.y, goalPosition.degree, 'red');
+  dataToHTML(); // update the html
+
+  if (starCarPosition.x !== -1)
+    drawCar(
+      starCarPosition.x,
+      starCarPosition.y,
+      starCarPosition.degree,
+      'green'
+    );
+  if (goalCarPosition.x !== -1)
+    drawCar(
+      goalCarPosition.x,
+      goalCarPosition.y,
+      goalCarPosition.degree,
+      'red'
+    );
 }
 
 function getObstacles() {
@@ -300,16 +345,15 @@ function getObstacles() {
 
   res = JSON.stringify(getTargetsAsArray());
 
-  console.log(res);
   navigator.clipboard.writeText(res);
+
   return res;
-  updateScreen();
 }
 
 function getGoalCar() {
   res = JSON.stringify([
-    Object.values(carPosition),
-    Object.values(goalPosition)
+    Object.values(starCarPosition),
+    Object.values(goalCarPosition)
   ]);
 
   navigator.clipboard.writeText(res);
@@ -318,13 +362,14 @@ function getGoalCar() {
 
 function importGoalCar() {
   const value = JSON.parse(document.getElementById('goalcarImportInput').value);
-  carPosition = { x: value[0][0], y: value[0][1], degree: value[0][2] };
-  goalPosition = { x: value[1][0], y: value[1][1], degree: value[1][2] };
+  starCarPosition = { x: value[0][0], y: value[0][1], degree: value[0][2] };
+  goalCarPosition = { x: value[1][0], y: value[1][1], degree: value[1][2] };
   document.getElementById('rotationInput').value =
-    carPosition.degree.toString();
-  document.getElementById('goalInput').value = goalPosition.degree.toString();
-  spawnGoal(goalPosition.x, goalPosition.y);
-  spawnCar(carPosition.x, carPosition.y);
+    starCarPosition.degree.toString();
+  document.getElementById('goalInput').value =
+    goalCarPosition.degree.toString();
+  spawnGoal(goalCarPosition.x, goalCarPosition.y);
+  spawnCar(starCarPosition.x, starCarPosition.y);
   updateScreen();
 }
 
@@ -351,7 +396,7 @@ function importObstacles() {
 
 function convert() {
   const toConvert = document.getElementById('inputpxl').value;
-  document.getElementById('outputmm').value = pxToMm(toConvert);
+  document.getElementById('outputmm').innerHTML = pxToMm(toConvert).toFixed(4);
 }
 
 function pxToMm(px) {
@@ -363,6 +408,10 @@ function pxToMm(px) {
   let onePixel = fieldSize[0] / w;
 
   return onePixel * px * 10;
+}
+
+function copyMMResult() {
+  navigator.clipboard.writeText(document.getElementById('outputmm').innerHTML);
 }
 
 //#region [functions] cars and goalPosition
@@ -408,36 +457,36 @@ function drawGoal(x, y) {
 function spawnGoal(x, y) {
   //drawGoal(x, y); ;
   const rotation = parseInt(document.getElementById('goalInput').value);
-  goalPosition = { x: x, y: y, degree: rotation };
+  goalCarPosition = { x: x, y: y, degree: rotation };
   drawCar(x, y, rotation, 'red');
-  goalMode = false;
+  createGoalCarMode = false;
   updateScreen();
   document.getElementById('mode').innerHTML = getModeStr();
 }
 
-function clearObstcales() {
+function clearMap() {
   targets = [];
+  starCarPosition = { x: -1, y: -1, degree: 0 };
+  goalCarPosition = { x: -1, y: -1, degree: 0 };
   updateScreen();
 }
 
 function spawnCar(x, y) {
   const rotation = parseInt(document.getElementById('rotationInput').value);
-  carPosition = { x: x, y: y, degree: rotation };
+  starCarPosition = { x: x, y: y, degree: rotation };
   drawCar(x, y, rotation, 'green');
-  carMode = false;
+  createStartCarMode = false;
   updateScreen();
 }
 
-let enableCarMode = () => {
-  carMode = true;
+const enableCarMode = () => {
+  createStartCarMode = true;
   document.getElementById('mode').innerHTML = 'set car';
 };
 
-let enableGoalMode = () => {
-  goalMode = true;
+const enableGoalMode = () => {
+  createGoalCarMode = true;
   document.getElementById('mode').innerHTML = 'set goal';
 };
-
 //#endregion
-
 // #endregion
