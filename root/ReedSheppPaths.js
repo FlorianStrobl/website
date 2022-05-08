@@ -1,7 +1,18 @@
 // Florian Strobl and Vladimir, April 2022
 // Implementation of Reed and Shepps Curves/Paths
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+// #endregion
 var ReedSheepPaths;
 (function (ReedSheepPaths) {
+    var debug = false;
     // conventions:
     // L: left-forward, R: right-forward, S: straight-forward,
     // l: left-backwards, r: right-backwards, s: straight-backwards
@@ -11,42 +22,10 @@ var ReedSheepPaths;
     // #region types and constants
     var twoPi = Math.PI * 2;
     var halfPi = Math.PI / 2;
-    var CSC;
-    (function (CSC) {
-        CSC["RSR"] = "RSR";
-        CSC["rSR"] = "rSR";
-        CSC["RSr"] = "RSr";
-        CSC["rSr"] = "rSr";
-        CSC["RsR"] = "RsR";
-        CSC["rsR"] = "rsR";
-        CSC["Rsr"] = "Rsr";
-        CSC["rsr"] = "rsr";
-        CSC["LSL"] = "LSL";
-        CSC["LSl"] = "LSl";
-        CSC["lSL"] = "lSL";
-        CSC["lSl"] = "lSl";
-        CSC["LsL"] = "LsL";
-        CSC["Lsl"] = "Lsl";
-        CSC["lsL"] = "lsL";
-        CSC["lsl"] = "lsl";
-    })(CSC || (CSC = {}));
     // #endregion
     // #region car data
     // the turning radius r for the given car
     var turningRadius = 10; // some arbitrary number for now
-    // TODO, not sure about that haha
-    // if start car = (0, 0, 0) and end car = (x, 0, PI)
-    // then the RSR path has the length = turningRadius * PI + (|A-B|)
-    // start values of the car
-    ReedSheepPaths.startCar = {
-        pos: { x: 0, y: 0 },
-        heading: degToRad(0) // 0 is right, 90 is north
-    };
-    // end/final values of the car
-    ReedSheepPaths.goalCar = {
-        pos: { x: 10, y: 0 },
-        heading: degToRad(45)
-    };
     // #endregion
     // #region helper functions
     function radToDeg(val) {
@@ -81,7 +60,6 @@ var ReedSheepPaths;
             y: car.pos.y - r * Math.sin(car.heading + halfPi)
         };
     }
-    ReedSheepPaths.getRightCircle = getRightCircle;
     // #endregion
     // #region CSC
     // RSR, (rsr) paths
@@ -112,8 +90,8 @@ var ReedSheepPaths;
          *
          * orientation: (1, 0)=0deg; (0, 1)=90deg; (-1, 0)=180deg; (0, -1)=270deg
          */
-        if (car1 === void 0) { car1 = ReedSheepPaths.startCar; }
-        if (car2 === void 0) { car2 = ReedSheepPaths.goalCar; }
+        if (car1 === void 0) { car1 = _startCar; }
+        if (car2 === void 0) { car2 = _goalCar; }
         if (r === void 0) { r = turningRadius; }
         // #region circles and distances
         // the right cirlces of start car and end car
@@ -195,90 +173,93 @@ var ReedSheepPaths;
         var result = [
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.RSR,
+                pathTypeValue: 'RSR',
                 arc1: lengthArc1,
                 straight: CD,
                 arc2: lengthArc2
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.RSr,
+                pathTypeValue: 'RSr',
                 arc1: lengthArc1,
                 straight: CD,
                 arc2: lengthArcPrime2
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.rSR,
+                pathTypeValue: 'rSR',
                 arc1: lengthArcPrime1,
                 straight: CD,
                 arc2: lengthArc2
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.rSr,
+                pathTypeValue: 'rSr',
                 arc1: lengthArcPrime1,
                 straight: CD,
                 arc2: lengthArcPrime2
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.RsR,
+                pathTypeValue: 'RsR',
                 arc1: lengthArc1Mirror,
                 straight: CD,
                 arc2: lengthArc2Mirror
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.Rsr,
+                pathTypeValue: 'Rsr',
                 arc1: lengthArc1Mirror,
                 straight: CD,
                 arc2: lengthArcPrime2Mirror
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.rsR,
+                pathTypeValue: 'rsR',
                 arc1: lengthArcPrime1Mirror,
                 straight: CD,
                 arc2: lengthArc2Mirror
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.rsr,
+                pathTypeValue: 'rsr',
                 arc1: lengthArcPrime1Mirror,
                 straight: CD,
                 arc2: lengthArcPrime2Mirror
             }
-        ].sort(function (a, b) { return a.arc1 + a.arc2 - (b.arc1 + b.arc2); });
-        console.log(result);
-        return {
-            startCarToAAngle: startCarToAAngle,
-            endCarToBAngle: endCarToBAngle,
-            cOrDAngle: cdAngle,
-            innerAngleStartC: innerAngleStartC,
-            innerAngleDEnd: innerAngleDEnd,
-            lengthArc1: lengthArc1,
-            lengthArc2: lengthArc2,
-            lengthCD: CD,
-            lengthTotalDistance: lengthArc1 + CD + lengthArc2,
-            innerAngleStartCPrime: innerAngleStartCPrime,
-            innerAngleDPrimeEnd: innerAngleDPrimeEnd,
-            lengthArcPrime1: lengthArcPrime1,
-            lengthArcPrime2: lengthArcPrime2,
-            cOrDAngle2: cdMirrorAngle,
-            A: A,
-            B: B,
-            C: C,
-            D: D,
-            CMirror: CMirror,
-            DMirror: DMirror
-        };
-        return result;
+        ];
+        if (debug) {
+            return {
+                // @ts-ignore
+                startCarToAAngle: startCarToAAngle,
+                endCarToBAngle: endCarToBAngle,
+                cOrDAngle: cdAngle,
+                innerAngleStartC: innerAngleStartC,
+                innerAngleDEnd: innerAngleDEnd,
+                lengthArc1: lengthArc1,
+                lengthArc2: lengthArc2,
+                lengthCD: CD,
+                lengthTotalDistance: lengthArc1 + CD + lengthArc2,
+                innerAngleStartCPrime: innerAngleStartCPrime,
+                innerAngleDPrimeEnd: innerAngleDPrimeEnd,
+                lengthArcPrime1: lengthArcPrime1,
+                lengthArcPrime2: lengthArcPrime2,
+                cOrDAngle2: cdMirrorAngle,
+                A: A,
+                B: B,
+                C: C,
+                D: D,
+                CMirror: CMirror,
+                DMirror: DMirror
+            };
+        }
+        else
+            return result;
     }
     ReedSheepPaths.getRSR = getRSR;
     function getLSL(car1, car2, r) {
-        if (car1 === void 0) { car1 = ReedSheepPaths.startCar; }
-        if (car2 === void 0) { car2 = ReedSheepPaths.goalCar; }
+        if (car1 === void 0) { car1 = _startCar; }
+        if (car2 === void 0) { car2 = _goalCar; }
         if (r === void 0) { r = turningRadius; }
         // #region circles and distances
         // the right cirlces of start car and end car
@@ -360,89 +341,305 @@ var ReedSheepPaths;
         var result = [
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.LSL,
+                pathTypeValue: 'LSL',
                 arc1: lengthArc1,
                 straight: CD,
                 arc2: lengthArc2
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.LSl,
+                pathTypeValue: 'LSl',
                 arc1: lengthArc1,
                 straight: CD,
                 arc2: lengthArcPrime2
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.lSL,
+                pathTypeValue: 'lSL',
                 arc1: lengthArcPrime1,
                 straight: CD,
                 arc2: lengthArc2
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.lSl,
+                pathTypeValue: 'lSl',
                 arc1: lengthArcPrime1,
                 straight: CD,
                 arc2: lengthArcPrime2
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.LsL,
+                pathTypeValue: 'LsL',
                 arc1: lengthArc1Mirror,
                 straight: CD,
                 arc2: lengthArc2Mirror
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.Lsl,
+                pathTypeValue: 'Lsl',
                 arc1: lengthArc1Mirror,
                 straight: CD,
                 arc2: lengthArcPrime2Mirror
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.lsL,
+                pathTypeValue: 'lsL',
                 arc1: lengthArcPrime1Mirror,
                 straight: CD,
                 arc2: lengthArc2Mirror
             },
             {
                 pathType: 'CSC',
-                pathTypeValue: CSC.lsl,
+                pathTypeValue: 'lsl',
                 arc1: lengthArcPrime1Mirror,
                 straight: CD,
                 arc2: lengthArcPrime2Mirror
             }
-        ].sort(function (a, b) { return a.arc1 + a.arc2 - (b.arc1 + b.arc2); });
-        console.log(result);
-        return {
-            startCarToAAngle: startCarToAAngle,
-            endCarToBAngle: endCarToBAngle,
-            cOrDAngle: cdAngle,
-            innerAngleStartC: innerAngleStartC,
-            innerAngleDEnd: innerAngleDEnd,
-            lengthArc1: lengthArc1,
-            lengthArc2: lengthArc2,
-            lengthCD: CD,
-            lengthTotalDistance: lengthArc1 + CD + lengthArc2,
-            innerAngleStartCPrime: innerAngleStartCPrime,
-            innerAngleDPrimeEnd: innerAngleDPrimeEnd,
-            lengthArcPrime1: lengthArcPrime1,
-            lengthArcPrime2: lengthArcPrime2,
-            cOrDAngle2: cdMirrorAngle,
-            A: A,
-            B: B,
-            C: C,
-            D: D,
-            CMirror: CMirror,
-            DMirror: DMirror
-        };
-        return result;
+        ];
+        if (debug) {
+            return {
+                // @ts-ignore
+                startCarToAAngle: startCarToAAngle,
+                endCarToBAngle: endCarToBAngle,
+                cOrDAngle: cdAngle,
+                innerAngleStartC: innerAngleStartC,
+                innerAngleDEnd: innerAngleDEnd,
+                lengthArc1: lengthArc1,
+                lengthArc2: lengthArc2,
+                lengthCD: CD,
+                lengthTotalDistance: lengthArc1 + CD + lengthArc2,
+                innerAngleStartCPrime: innerAngleStartCPrime,
+                innerAngleDPrimeEnd: innerAngleDPrimeEnd,
+                lengthArcPrime1: lengthArcPrime1,
+                lengthArcPrime2: lengthArcPrime2,
+                cOrDAngle2: cdMirrorAngle,
+                A: A,
+                B: B,
+                C: C,
+                D: D,
+                CMirror: CMirror,
+                DMirror: DMirror
+            };
+        }
+        else
+            return result;
     }
     ReedSheepPaths.getLSL = getLSL;
+    function getCSCPaths(car1, car2, r) {
+        if (car1 === void 0) { car1 = _startCar; }
+        if (car2 === void 0) { car2 = _goalCar; }
+        if (r === void 0) { r = turningRadius; }
+        var rsrPaths = getRSR(car1, car2, r);
+        var lslPaths = getLSL(car1, car2, r);
+        // sort the paths after their length
+        var paths = __spreadArray(__spreadArray([], rsrPaths, true), lslPaths, true).sort(function (a, b) { return a.arc1 + a.arc2 - (b.arc1 + b.arc2); });
+        return paths;
+    }
+    ReedSheepPaths.getCSCPaths = getCSCPaths;
     // #endregion
 })(ReedSheepPaths || (ReedSheepPaths = {}));
-// console.log(
-//   ReedSheepPaths.getRSR(ReedSheepPaths.startCar, ReedSheepPaths.goalCar, 10)
-// );
+// #region default values for car
+// start values of the car
+var _startCar = {
+    pos: { x: 0, y: 0 },
+    heading: ReedSheepPaths.degToRad(0) // 0 is right, 90 is north
+};
+// end/final values of the car
+var _goalCar = {
+    pos: { x: 653, y: 135 },
+    heading: ReedSheepPaths.degToRad(246)
+};
+// #endregion
+var Drive;
+(function (Drive) {
+    // constants of the hardware
+    var carData = {
+        wheelCirc: 5,
+        turningRadius: 1,
+        pointToUp: 1,
+        pointToDown: 0.5,
+        pointToSide: 0.5
+    };
+    // drive direction
+    var driveDirec;
+    (function (driveDirec) {
+        driveDirec[driveDirec["L"] = -1] = "L";
+        driveDirec[driveDirec["S"] = 0] = "S";
+        driveDirec[driveDirec["R"] = 1] = "R";
+    })(driveDirec || (driveDirec = {}));
+    function getPath(startCar, endCar, turningRadius) {
+        // all CSC paths
+        var paths = ReedSheepPaths.getCSCPaths(startCar, endCar, turningRadius);
+        // check if path doesnt collide with car and obstacles
+        for (var _i = 0, paths_1 = paths; _i < paths_1.length; _i++) {
+            var path = paths_1[_i];
+            var instr = pathToInstr(path); // get the instructions
+            if (Sim.drivePath(startCar, instr, []) === true) {
+                // path can be driven even with the obstacles!
+                //console.log('path, instr:', path, instr);
+                return instr;
+            }
+        }
+        throw Error("Coulnd't find a valid path");
+    }
+    Drive.getPath = getPath;
+    function pathToInstr(path) {
+        if (path.pathType === 'CSC') {
+            var instruction = [];
+            var type = path.pathTypeValue;
+            // part 1: C
+            if (type.toLowerCase().startsWith('r'))
+                instruction.push({
+                    direction: driveDirec.R,
+                    len: type.startsWith('r') ? -path.arc1 : path.arc1 // forward/reversing
+                });
+            else
+                instruction.push({
+                    direction: driveDirec.L,
+                    len: type.startsWith('l') ? -path.arc1 : path.arc1 // forward/reversing
+                });
+            // part 2: S
+            instruction.push({
+                direction: driveDirec.S,
+                len: type[1] === 'S' ? path.straight : -path.straight // forward/reversing
+            });
+            // part 3: C
+            if (type.toLowerCase().endsWith('r'))
+                instruction.push({
+                    direction: driveDirec.R,
+                    len: type.endsWith('r') ? -path.arc1 : path.arc1
+                });
+            else
+                instruction.push({
+                    direction: driveDirec.L,
+                    len: type.endsWith('l') ? -path.arc1 : path.arc1
+                });
+            return instruction;
+        }
+        else
+            return 'error';
+    }
+    function drive(instrs) {
+        // TODO
+        // init motors
+        var oldSteerVal = instrs[0].direction;
+        for (var i = 0; i < instrs.length; ++i) {
+            var instr = instrs[i];
+            // #region set the front wheels
+            // steering from -1 (left) to 1 (right) is +2 steps...
+            // first step is different tho
+            var steer = i === 0
+                ? instr.direction
+                : (oldSteerVal <= instr.direction ? 1 : -1) *
+                    Math.abs(oldSteerVal - instr.direction);
+            oldSteerVal = instr.direction;
+            // rotate front wheels whith this steer*multiplier
+            var steerMultiplier = 0; // steer is between -2 and 2...
+            // #endregion
+            // drive with back wheels
+            //console.log(steer * 45, instr.len);
+        }
+    }
+    Drive.drive = drive;
+    var Sim;
+    (function (Sim) {
+        // returns true if the path is drivable
+        function drivePath(_car, instrs, obstacles) {
+            //console.log('Check if this path is valid: ', _car, instrs, obstacles);
+            var _loop_1 = function (instr) {
+                //console.log('simulate driving this instruction: ', instr);
+                var deltaT = 0.001; // in s
+                var speed = 1; // 1mm per s
+                var timeNeeded = instr.len / speed;
+                // if newCarValues is at the end, stop
+                for (var i = 0; i < timeNeeded; i += deltaT) {
+                    _car = updateCar(_car, instrDirToAngle(instr.direction));
+                    // if newCarValue hit an obstacle stop
+                    if (checkIfHit(_car, obstacles)) {
+                        return { value: false };
+                    }
+                }
+                //console.log('new car values after this instruction executed: ', _car);
+                function updateCar(car, steering) {
+                    // set new position and heading
+                    car.heading +=
+                        deltaT * (speed / carData.turningRadius) * Math.tan(steering);
+                    car.heading %= Math.PI * 2; // wrap around
+                    car.pos.x += deltaT * speed * Math.cos(car.heading);
+                    car.pos.y += deltaT * speed * Math.sin(car.heading);
+                    return car;
+                }
+                function checkIfHit(car, obstacles) {
+                    for (var _i = 0, obstacles_1 = obstacles; _i < obstacles_1.length; _i++) {
+                        var obs = obstacles_1[_i];
+                        // right, left, up, down
+                        // TODO
+                        var carCorners = {
+                            lu: [
+                                car.pos.x +
+                                    Math.cos(car.heading) * carData.pointToSide -
+                                    Math.sin(car.heading) * carData.pointToUp,
+                                car.pos.y +
+                                    Math.sin(car.heading) * carData.pointToSide +
+                                    Math.cos(car.heading) * carData.pointToDown
+                            ],
+                            ld: [-1, -1],
+                            ru: [-1, -1],
+                            rd: [-1, -1]
+                        };
+                        // check if one of the cars corners in inside the obstacle
+                        if (checkPointHitRect(carCorners.lu, obs) ||
+                            checkPointHitRect(carCorners.ru, obs) ||
+                            checkPointHitRect(carCorners.ld, obs) ||
+                            checkPointHitRect(carCorners.rd, obs)) {
+                            return false; // car corner was inside the obstacle
+                        }
+                        // check if corner to another corner (line) hit an obstacle
+                        if (checkLineHitRect(carCorners.lu, carCorners.ru, obs) ||
+                            checkLineHitRect(carCorners.rd, carCorners.ld, obs) ||
+                            checkLineHitRect(carCorners.lu, carCorners.ld, obs) ||
+                            checkLineHitRect(carCorners.ru, carCorners.rd, obs)) {
+                            return false; // car hit this obstacle
+                        }
+                    }
+                    // no obstacle returned false
+                    return true;
+                    function checkPointHitRect(point, // [x, y]
+                    obs //[[x1, y1], [x2, y2]]
+                    ) {
+                        var smallerObsX = obs[0][0] < obs[1][0] ? obs[0][0] : obs[1][0];
+                        var biggerObsX = obs[0][0] === smallerObsX ? obs[1][0] : obs[0][0];
+                        var smallerObsY = obs[0][1] < obs[1][1] ? obs[0][1] : obs[1][1];
+                        var biggerObsY = obs[0][1] === smallerObsX ? obs[1][1] : obs[0][1];
+                        var isBetweenX = point[0] >= smallerObsX && point[0] <= biggerObsX;
+                        var isBetweenY = point[1] >= smallerObsY && point[1] <= biggerObsY;
+                        return isBetweenX && isBetweenY;
+                    }
+                    function checkLineHitRect(a, b, obs) {
+                        // TODO
+                        return false;
+                    }
+                }
+                function instrDirToAngle(n) {
+                    // TODO
+                    return -1;
+                }
+            };
+            /*
+              Vehicle Dynamics:
+              X(t+dt) = X(t) + (v * cos orientation) * dt
+              Y(t+dt) = Y(t) + (v * sin orientation) * dt
+              theta(t+dt) = theta(t) + dt * (v/r)
+            */
+            for (var _i = 0, instrs_1 = instrs; _i < instrs_1.length; _i++) {
+                var instr = instrs_1[_i];
+                var state_1 = _loop_1(instr);
+                if (typeof state_1 === "object")
+                    return state_1.value;
+            }
+            return true;
+        }
+        Sim.drivePath = drivePath;
+    })(Sim || (Sim = {}));
+})(Drive || (Drive = {}));
+//console.log(Drive.getPath(_startCar, _goalCar, 10));

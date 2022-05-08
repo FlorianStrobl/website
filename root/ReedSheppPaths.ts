@@ -628,7 +628,7 @@ namespace Drive {
       instrs: instr[],
       obstacles: []
     ): boolean {
-      console.log('Check if this path is valid: ', _car, instrs, obstacles);
+      //console.log('Check if this path is valid: ', _car, instrs, obstacles);
 
       /*
         Vehicle Dynamics:
@@ -638,7 +638,7 @@ namespace Drive {
       */
 
       for (const instr of instrs) {
-        console.log('simulate driving this instruction: ', instr);
+        //console.log('simulate driving this instruction: ', instr);
 
         const deltaT: number = 0.001; // in s
         const speed: number = 1; // 1mm per s
@@ -653,7 +653,7 @@ namespace Drive {
           }
         }
 
-        console.log('new car values after this instruction executed: ', _car);
+        //console.log('new car values after this instruction executed: ', _car);
 
         function updateCar(car: car, steering: number): car {
           // set new position and heading
@@ -744,7 +744,7 @@ namespace Drive {
           }
         }
 
-        function instrDirToAngle(n: number ): number {
+        function instrDirToAngle(n: number): number {
           // TODO
           return -1;
         }
@@ -755,4 +755,4 @@ namespace Drive {
   }
 }
 
-console.log(Drive.getPath(_startCar, _goalCar, 10));
+//console.log(Drive.getPath(_startCar, _goalCar, 10));
