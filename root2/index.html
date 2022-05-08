@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <body>
+    import goal geht noch nicht!!
     <div id="xy" style="margin-bottom: 20px">X : - , Y : -</div>
     <div style="display: flex">
       <p id="mode">Create mode</p>
@@ -17,9 +18,27 @@
       <p  style="margin-left: 10px; margin-right: 10px">|</p>
 
        <button onclick="getObstacles()" style="margin-left: 3px; height: 20px; margin-top: 15px">
-        copy obstacles corrdinates
+        copy obstacles
+      </button>
+      <input id="obstaclesImportInput"  placeholder="import" style=" margin-left: 5px; height: 15px;width: 50px; margin-top: 15px"></input>
+       <button onclick="getObstacles()" style="margin-left: 3px; height: 20px; margin-top: 15px">
+        import obstacles
+      </button>
+      <p  style="margin-left: 10px; margin-right: 10px">|</p>
+
+      <button onclick="getGoalCar()" style="margin-left: 3px; height: 20px; margin-top: 15px">
+        copy goal & car
+      </button>
+      <input id="goalcarImportInput"   placeholder="import" style=" margin-left: 5px; height: 15px;width: 50px; margin-top: 15px"></input>
+       <button onclick="importGoalCar()" style="margin-left: 3px; height: 20px; margin-top: 15px">
+        import goal & car
+      </button>
+      <p  style="margin-left: 10px; margin-right: 10px">|</p>
+      <button onclick="clearObstcales()" style="margin-left: 3px; height: 20px; margin-top: 15px">
+        clear all
       </button>
     </div>
+
 
     <div style="display: flex">
       <canvas
@@ -54,4 +73,5 @@
     </div>
   </body>
   <script type="text/javascript" src="script.js"></script>
+
 </html>

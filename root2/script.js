@@ -13,7 +13,7 @@ let carMode = false; //mode to spawn a car
 let eraseMode = false; // delete targets instead of creating them
 
 let carPosition = { x: -1000, y: -1000, degree: 90 };
-let goalPosition = { x: -1000, y: -1000 };
+let goalPosition = { x: -1000, y: -1000, degree: 90 };
 
 let targets = []; // [pos1, pos2, name, color][]
 let resetTargets = []; // for "z" and "y"
@@ -295,7 +295,42 @@ function getObstacles() {
   return res;
 }
 
-//#region [functions] cars and goals
+function getGoalCar() {
+  res = JSON.stringify([
+    Object.values(carPosition),
+    Object.values(goalPosition)
+  ]);
+
+  navigator.clipboard.writeText(res);
+  return res;
+}
+
+function importGoalCar() {
+    const value = JSON.parse(
+      document.getElementById('goalcarImportInput').value
+    );
+    carPosition = { x: value[0][0], y: value[0][1], degree: value[0][2] };
+    goalPosition = { x: value[1][0], y: value[1][1], degree: value[1][2] };
+    document.getElementById('rotationInput') = carPosition.degree.toString()
+    document.getElementById('goalInput') = carPosition.degree.toString()
+    spawnGoal(goalPosition.x, goalPosition.y);
+    spawnCar(carPosition.x, carPosition.y)
+
+}
+
+function importObstacles(){
+
+    const value = JSON.parse(
+      document.getElementById('"obstaclesImportInput').value
+    );
+
+    document.getElementById('rotationInput') = carPosition.degree.toString()
+    document.getElementById('goalInput') = carPosition.degree.toString()
+    spawnGoal(goalPosition.x, goalPosition.y);
+    spawnCar(carPosition.x, carPosition.y)
+}
+
+//#region [functions] cars and goalPosition
 function drawCar(x, y, rotation, color) {
   ctx.fillStyle = color;
   ctx.globalAlpha = 0.8;
@@ -336,6 +371,11 @@ function spawnGoal(x, y) {
   goalMode = false;
   updateScreen();
   document.getElementById('mode').innerHTML = getModeStr();
+}
+
+function clearObstcales(){
+ targets = [];
+ updateScreen()
 }
 
 function spawnCar(x, y) {
