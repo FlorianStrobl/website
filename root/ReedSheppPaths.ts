@@ -17,8 +17,6 @@ type path = {
 // #endregion
 
 namespace ReedSheepPaths {
-  let debug: boolean = false;
-
   // conventions:
 
   // L: left-forward, R: right-forward, S: straight-forward,
@@ -76,7 +74,8 @@ namespace ReedSheepPaths {
   export function getRSR(
     car1: car = _startCar,
     car2: car = _goalCar,
-    r: number = turningRadius
+    r: number = turningRadius,
+    debug: boolean = false
   ): path[] {
     /**
      * RSR paths:
@@ -291,7 +290,8 @@ namespace ReedSheepPaths {
   export function getLSL(
     car1: car = _startCar,
     car2: car = _goalCar,
-    r: number = turningRadius
+    r: number = turningRadius,
+    debug: boolean = false
   ): path[] {
     // #region circles and distances
     // the right cirlces of start car and end car
@@ -541,7 +541,7 @@ namespace Drive {
       endCar,
       turningRadius
     );
-
+    console.log(paths[0]);
     // check if path doesnt collide with car and obstacles
     for (const path of paths) {
       const instr: instr[] = pathToInstr(path); // get the instructions
@@ -583,12 +583,12 @@ namespace Drive {
       if (type.toLowerCase().endsWith('r'))
         instruction.push({
           direction: driveDirec.R,
-          len: type.endsWith('r') ? -path.arc1 : path.arc1
+          len: type.endsWith('r') ? -path.arc2 : path.arc2
         });
       else
         instruction.push({
           direction: driveDirec.L,
-          len: type.endsWith('l') ? -path.arc1 : path.arc1
+          len: type.endsWith('l') ? -path.arc2 : path.arc2
         });
 
       return instruction;
@@ -629,7 +629,8 @@ namespace Drive {
       obstacles: []
     ): boolean {
       //console.log('Check if this path is valid: ', _car, instrs, obstacles);
-
+      // TODO
+      return true;
       /*
         Vehicle Dynamics:
         X(t+dt) = X(t) + (v * cos orientation) * dt
@@ -755,4 +756,10 @@ namespace Drive {
   }
 }
 
-//console.log(Drive.getPath(_startCar, _goalCar, 10));
+console.log(
+  Drive.getPath(
+    { pos: { x: 1000, y: 1000 }, heading: 0 },
+    { pos: { x: 1200, y: 1200 }, heading: 0 },
+    57.2957795131
+  )
+);

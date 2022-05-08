@@ -41,9 +41,10 @@ function run() {
   endCar = _endCar;
   // #endregion
 
-  ReedSheepPaths.debug = true;
-  const vals = ReedSheepPaths.getRSR(_startCar, _endCar, turningRadius);
-  const vals2 = ReedSheepPaths.getLSL(_startCar, _endCar, turningRadius);
+  const vals = ReedSheepPaths.getRSR(_startCar, _endCar, turningRadius, true);
+  const vals2 = ReedSheepPaths.getLSL(_startCar, _endCar, turningRadius, true);
+
+  clearScreen();
   updateScreen(vals.A, vals.B, vals.C, vals.D, vals.CMirror, vals.DMirror);
   updateScreen(
     vals2.A,
@@ -76,7 +77,7 @@ function run() {
         key.length !== 1 &&
         !key.endsWith('Mirror')
       )
-        return ReedSheepPaths.radToDeg(value).toFixed(2);
+        return ReedSheepPaths.radToDeg(value).toFixed(2) + '°';
       else if (typeof value === 'number') return value.toFixed(2);
       else return value;
     },
@@ -120,8 +121,6 @@ const drawLine = (_x, _y) => {
 };
 
 function updateScreen(__A, __B, __C, __D, __CMirror, __DMirror) {
-  //clearScreen();
-
   setPixel(startCar.pos.x, startCar.pos.y, [255, 0, 0]); // start car
   setPixel(endCar.pos.x, endCar.pos.y, [0, 255, 0]); // end car
 
@@ -162,7 +161,6 @@ function updateScreen(__A, __B, __C, __D, __CMirror, __DMirror) {
 }
 
 function clearScreen() {
-  // TODO ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let y = 0; y < canvas.height; ++y)
-    for (let x = 0; x < canvas.width; ++x) setPixel(x, y, [255, 255, 255]);
+  ctx.fillStyle = `rgb(0,0,0)`;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
