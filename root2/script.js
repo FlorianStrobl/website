@@ -284,7 +284,6 @@ function updateScreen() {
 }
 
 function getObstacles() {
-  updateScreen();
   function getTargetsAsArray() {
     r = [];
     for (target of targets) {
@@ -304,6 +303,7 @@ function getObstacles() {
   console.log(res);
   navigator.clipboard.writeText(res);
   return res;
+  updateScreen();
 }
 
 function getGoalCar() {
