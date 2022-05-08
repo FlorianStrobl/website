@@ -273,8 +273,8 @@ function updateScreen() {
   clearCanvas(); // reset the entire screen
   drawTargets(); // draw all the targets
   renderTargetsData(); // update the html
-  drawCar(carPosition.x, carPosition.y, carPosition.degree);
-  drawGoal(goalPosition.x, goalPosition.y);
+  drawCar(carPosition.x, carPosition.y, carPosition.degree, 'green');
+  drawCar(goalPosition.x, goalPosition.y, goalPosition.degree, 'red');
 }
 
 function getObstacles() {
@@ -296,8 +296,8 @@ function getObstacles() {
 }
 
 //#region [functions] cars and goals
-function drawCar(x, y, rotation) {
-  ctx.fillStyle = 'green';
+function drawCar(x, y, rotation, color) {
+  ctx.fillStyle = color;
   ctx.globalAlpha = 0.8;
 
   ctx.beginPath();
@@ -305,7 +305,7 @@ function drawCar(x, y, rotation) {
   const w = 175;
   const h = 50;
   let rect = { x: x - w / 2, y: y - h / 2, width: 175, height: 50 };
-  rotation *= Math.PI / 180;
+  rotation *= Math.PI / -180;
 
   ctx.translate(rect.x + rect.width / 2, rect.y + rect.height / 2);
   ctx.rotate(rotation);
@@ -329,8 +329,10 @@ function drawGoal(x, y) {
 }
 
 function spawnGoal(x, y) {
-  goalPosition = { x: x, y: y };
-  drawGoal(x, y);
+  //drawGoal(x, y); ;
+  const rotation = parseInt(document.getElementById('goalInput').value);
+  goalPosition = { x: x, y: y, degree: rotation };
+  drawCar(x, y, rotation, 'red');
   goalMode = false;
   updateScreen();
   document.getElementById('mode').innerHTML = getModeStr();
@@ -339,7 +341,7 @@ function spawnGoal(x, y) {
 function spawnCar(x, y) {
   const rotation = parseInt(document.getElementById('rotationInput').value);
   carPosition = { x: x, y: y, degree: rotation };
-  drawCar(x, y, rotation);
+  drawCar(x, y, rotation, 'green');
   carMode = false;
   updateScreen();
 }
@@ -358,6 +360,4 @@ let enableGoalMode = () => {
 
 // #endregion
 
-function pxToCm(px){
-  
-}
+function pxToCm(px) {}
