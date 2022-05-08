@@ -322,7 +322,7 @@ function importGoalCar() {
   goalPosition = { x: value[1][0], y: value[1][1], degree: value[1][2] };
   document.getElementById('rotationInput').value =
     carPosition.degree.toString();
-  document.getElementById('goalInput').value = carPosition.degree.toString();
+  document.getElementById('goalInput').value = goalPosition.degree.toString();
   spawnGoal(goalPosition.x, goalPosition.y);
   spawnCar(carPosition.x, carPosition.y);
   updateScreen();
@@ -375,14 +375,21 @@ function drawCar(x, y, rotation, color) {
   const w = 175;
   const h = 50;
   let rect = { x: x - w / 2, y: y - h / 2, width: 175, height: 50 };
-  rotation *= Math.PI / -180;
+  rotation *= Math.PI / 180;
+  rotation *= -1;
 
   ctx.translate(rect.x + rect.width / 2, rect.y + rect.height / 2);
   ctx.rotate(rotation);
   ctx.translate(-rect.x - rect.width / 2, -rect.y - rect.height / 2);
   ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
   ctx.fill();
-  ctx.rotate(-rotation);
+
+  if (rotation < 0) {
+    ctx.rotate(rotation);
+  } else {
+    ctx.rotate(-rotation);
+  }
+
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
