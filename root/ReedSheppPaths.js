@@ -642,4 +642,4 @@ var Drive;
         Sim.drivePath = drivePath;
     })(Sim || (Sim = {}));
 })(Drive || (Drive = {}));
-//console.log(Drive.getPath(_startCar, _goalCar, 10));
+console.log(Drive.getPath(_startCar, _goalCar, 10));
