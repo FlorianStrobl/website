@@ -192,6 +192,10 @@ function renderTargetsData() {
 
   // create for each target a div with all the values
   for (const target of targets) {
+    const deltaX = target[0].x - target[1].x;
+    const deltaY = target[0].y - target[1].y;
+    const len = Math.floor((deltaX ** 2 + deltaY ** 2) ** 0.5);
+
     result +=
       `<div
 
@@ -227,7 +231,9 @@ function renderTargetsData() {
       target[1].x +
       `, y: ` +
       target[1].y +
-      ` }
+      ` } length: ` +
+      pxToMm(len) +
+      ` mm
             </p>
           </div>
         </div>`;
@@ -278,16 +284,21 @@ function updateScreen() {
 }
 
 function getObstacles() {
+  updateScreen();
   function getTargetsAsArray() {
     r = [];
     for (target of targets) {
       r.push([
         [target[0].x, target[0].y],
-        [target[1].x, target[1].y]
+        [target[1].x, target[1].y],
+        target[2],
+        target[3]
       ]);
     }
+
     return r;
   }
+
   res = JSON.stringify(getTargetsAsArray());
 
   console.log(res);
@@ -306,28 +317,52 @@ function getGoalCar() {
 }
 
 function importGoalCar() {
-    const value = JSON.parse(
-      document.getElementById('goalcarImportInput').value
-    );
-    carPosition = { x: value[0][0], y: value[0][1], degree: value[0][2] };
-    goalPosition = { x: value[1][0], y: value[1][1], degree: value[1][2] };
-    document.getElementById('rotationInput') = carPosition.degree.toString()
-    document.getElementById('goalInput') = carPosition.degree.toString()
-    spawnGoal(goalPosition.x, goalPosition.y);
-    spawnCar(carPosition.x, carPosition.y)
-
+  const value = JSON.parse(document.getElementById('goalcarImportInput').value);
+  carPosition = { x: value[0][0], y: value[0][1], degree: value[0][2] };
+  goalPosition = { x: value[1][0], y: value[1][1], degree: value[1][2] };
+  document.getElementById('rotationInput').value =
+    carPosition.degree.toString();
+  document.getElementById('goalInput').value = carPosition.degree.toString();
+  spawnGoal(goalPosition.x, goalPosition.y);
+  spawnCar(carPosition.x, carPosition.y);
+  updateScreen();
 }
 
-function importObstacles(){
+function importObstacles() {
+  function getTargetsAsObject(array) {
+    let obstacles = JSON.parse(array);
+    let r = [];
+    for (x of obstacles) {
+      r.push([
+        { x: x[0][0], y: x[0][1] },
+        { x: x[1][0], y: x[1][1] },
+        x[2],
+        x[3]
+      ]);
+    }
+    return r;
+  }
 
-    const value = JSON.parse(
-      document.getElementById('"obstaclesImportInput').value
-    );
+  targets = getTargetsAsObject(
+    document.getElementById('obstaclesImportInput').value
+  );
+  updateScreen();
+}
 
-    document.getElementById('rotationInput') = carPosition.degree.toString()
-    document.getElementById('goalInput') = carPosition.degree.toString()
-    spawnGoal(goalPosition.x, goalPosition.y);
-    spawnCar(carPosition.x, carPosition.y)
+function convert() {
+  const toConvert = document.getElementById('inputpxl').value;
+  document.getElementById('outputmm').value = pxToMm(toConvert);
+}
+
+function pxToMm(px) {
+  const w = 5004;
+  const h = 2438;
+
+  const fieldSize = [236.2, 114.3];
+
+  let onePixel = fieldSize[0] / w;
+
+  return onePixel * px * 10;
 }
 
 //#region [functions] cars and goalPosition
@@ -373,9 +408,9 @@ function spawnGoal(x, y) {
   document.getElementById('mode').innerHTML = getModeStr();
 }
 
-function clearObstcales(){
- targets = [];
- updateScreen()
+function clearObstcales() {
+  targets = [];
+  updateScreen();
 }
 
 function spawnCar(x, y) {
@@ -399,5 +434,3 @@ let enableGoalMode = () => {
 //#endregion
 
 // #endregion
-
-function pxToCm(px) {}
