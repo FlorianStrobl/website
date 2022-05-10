@@ -421,8 +421,8 @@ function drawCar(x, y, rotation, color) {
 
   ctx.beginPath();
 
-  const w = 175;
-  const h = 50;
+  const w = 530;
+  const h = 500;
   let rect = { x: x - w / 2, y: y - h / 2, width: 175, height: 50 };
   rotation *= Math.PI / 180;
   rotation *= -1;
