@@ -427,6 +427,8 @@ function drawCar(x, y, rotation, color) {
   rotation *= Math.PI / 180;
   rotation *= -1;
 
+  console.log('draw a car');
+
   ctx.translate(rect.x + rect.width / 2, rect.y + rect.height / 2);
   ctx.rotate(rotation);
   ctx.translate(-rect.x - rect.width / 2, -rect.y - rect.height / 2);
