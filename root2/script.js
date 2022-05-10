@@ -423,7 +423,7 @@ function drawCar(x, y, rotation, color) {
 
   const w = 530;
   const h = 500;
-  let rect = { x: x - w / 2, y: y - h / 2, width: 175, height: 50 };
+  let rect = { x: x - w / 2, y: y - h / 2, width: w, height: h };
   rotation *= Math.PI / 180;
   rotation *= -1;
 
@@ -433,11 +433,7 @@ function drawCar(x, y, rotation, color) {
   ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
   ctx.fill();
 
-  if (rotation < 0) {
-    ctx.rotate(rotation);
-  } else {
-    ctx.rotate(-rotation);
-  }
+  ctx.rotate(rotation < 0 ? rotation : -rotation);
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
