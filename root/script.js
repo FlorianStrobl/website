@@ -63,14 +63,14 @@ function run() {
 
   clearScreen();
   updateScreen(vals.A, vals.B, vals.C, vals.D, vals.CMirror, vals.DMirror);
-  // updateScreen(
-  //   vals2.A,
-  //   vals2.B,
-  //   vals2.C,
-  //   vals2.D,
-  //   vals2.CMirror,
-  //   vals2.DMirror
-  // );
+  updateScreen(
+    vals2.A,
+    vals2.B,
+    vals2.C,
+    vals2.D,
+    vals2.CMirror,
+    vals2.DMirror
+  );
 
   const outputStr1 =
     'Right circle from start car middle point: { x: ' +
